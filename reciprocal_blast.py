@@ -19,7 +19,8 @@ def make_blast_db(tgt):
     Format a FASTA file as suitable blastp db
     src is the absolute path to the fasta file.'''
     
-    os.system("{0} -in {1} -dbtype prot".format(DB_MAKER, tgt))
+    os.system("{0} -in {1} -dbtype prot -logfile DBBLAST.log".format(
+        DB_MAKER, tgt))
 
     return True
 
