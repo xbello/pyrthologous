@@ -2,6 +2,8 @@
 import os
 from Bio import SeqIO, Seq
 
+from config import SEP
+
 def translate_seq(nucl_seq):
     """string -> string
 
@@ -18,7 +20,6 @@ def translate_seq(nucl_seq):
 def process_file(fasta="", equivalences="", translate=False):
     """filename, filename -> bool
     """
-    SEP = ";"
     if not os.path.isfile(fasta):
         return False
 
