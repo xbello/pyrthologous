@@ -18,6 +18,7 @@ def translate_seq(nucl_seq):
 def process_file(fasta="", equivalences="", translate=False):
     """filename, filename -> bool
     """
+    SEP = ";"
     if not os.path.isfile(fasta):
         return False
 
@@ -31,7 +32,7 @@ def process_file(fasta="", equivalences="", translate=False):
     n_seq = 0
     for rec in SeqIO.parse(fasta, "fasta"):
         new_fasta_fp.write(">{0}\n".format(n_seq))
-        equiv_file.write("{0},{1}\n".format(rec.name, n_seq))
+        equiv_file.write("{0}{1}{2}\n".format(rec.name, SEP, n_seq))
         n_seq += 1
         if translate:
             new_fasta_fp.write("{0}\n".format(translate_seq(rec.seq)))
