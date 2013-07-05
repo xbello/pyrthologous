@@ -1,3 +1,5 @@
+import itertools
+import os
 from config import BASE_PATH
 
 def make_reciprocals(src_dir):
