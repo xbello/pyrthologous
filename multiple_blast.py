@@ -2,8 +2,7 @@
 import itertools
 import os
 
-base_path = "/opt/space/data/Parasitos/secuencias"
-src_dirs = ["Babesia", "Giardia", "Theileria", "Toxoplasma"]
+from config import BASE_PATH, LEAF_PATHS, OUTPUT
 
 def make_output_name(file_1, file_2):
     """String, String -> String
@@ -16,15 +15,18 @@ def make_output_name(file_1, file_2):
 
     return "{0}_vs_{1}.blast".format(query, subject)
 
-for src_dir in src_dirs:
-    genome_src = os.path.join(base_path, src_dir)
+for src_dir in LEAF_PATHS:
+    genome_src = os.path.join(BASE_PATH, src_dir)
     reciprocals = [x for x in os.listdir(genome_src) if x.endswith("fas")]
     permuts = [x for x in itertools.combinations(reciprocals, 2)]
 
     for permut in permuts:
         for x, y in [(0, 1), (1, 0)]:
             output = make_output_name(permut[x], permut[y])
+            print "BLASTING {0}...".format(permut),
             os.system("python reciprocal_blast.py {0} {1} > {2}".format(
                 os.path.join(genome_src, permut[x]),
                 os.path.join(genome_src, permut[y]),
-                os.path.join(os.getcwd(), "outputs", output)))
+                os.path.join(os.getcwd(), OUTPUT, output),
+                ))
+            print "OK"
