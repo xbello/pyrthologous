@@ -2,17 +2,8 @@
 import os
 from Bio import SeqIO
 
-from config import SEP
+from config import SEP, MUSCLE
 
-file_1 = "outputs/Bv-Bm.txt"
-fasta_src_1 = "../Babesia/Babesia_bovis_NORM.fas"
-bases_src_1 = "../Babesia/Babesia_bovis.fasta"
-
-file_2 = "outputs/Bm-Bv.txt"
-fasta_src_2 = "../Babesia/Babesia_microti_NORM.fas"
-bases_src_2 = "../Babesia/Babesia_microti.fasta"
-
-align_dir = "BV_BM"
 muscle = "/home/xbello/bin/muscle"
 
 def comp_dicts(dict_1, dict_2):
@@ -66,7 +57,7 @@ def make_align(seq_id_one, seq_id_two):
     handle.close()
 
     os.system("{0} -in {1} -out {2}".format(
-        muscle, output_file, output_file + ".al"))
+        MUSCLE, output_file, output_file + ".al"))
 
     return output_file + ".al"
 
@@ -143,14 +134,50 @@ def seq_aa_to_bases(seq_aa, seq_bases):
 
     return new_seq
 
+if __name__ == "__main__":
+    import config
+    import utils
+    import sys
 
-trans_table_1 = make_transtable("../Babesia/B_bovis.txt")
-trans_table_2 = make_transtable("../Babesia/B_microti.txt")
-one_to_two = get_dir(file_1)
-two_to_one = get_dir(file_2)
+    for x in config.LEAF_PATHS:
+        for pair in utils.make_reciprocals(x):
+            organism_1 = "_".join(pair[0].split(".")[0].split("_")[:2])
+            organism_2 = "_".join(pair[1].split(".")[0].split("_")[:2])
 
-new_dict = comp_dicts(one_to_two, two_to_one)
+            genus = organism_1.split("_")[0]
 
-for k, v in new_dict.iteritems():
-    alignment_name = make_align(k, v)
-    protein_to_bases(alignment_name, k, v)
+            organism_1_abbr = "".join([x[0] for x in organism_1.split("_")])
+            organism_2_abbr = "".join([x[0] for x in organism_2.split("_")])
+        
+            file_1 = os.path.join(
+                config.OUTPUT,
+                "_vs_".join([organism_1_abbr, organism_2_abbr]) + ".blast")
+            file_2 = os.path.join(
+                config.OUTPUT,
+                "_vs_".join([organism_2_abbr, organism_1_abbr]) + ".blast")
+
+            fasta_src_1 = os.path.join(
+                config.BASE_PATH,
+                genus,
+                pair[0])
+            bases_src_1 = fasta_src_1.replace("_NORM", "") + "ta"
+            fasta_src_2 = os.path.join(
+                config.BASE_PATH,
+                genus,
+                pair[1])
+            bases_src_2 = fasta_src_2.replace("_NORM", "") + "ta"
+
+            align_dir = "_vs_".join([organism_1_abbr, organism_2_abbr])
+            if not os.path.isdir(align_dir): os.mkdir(align_dir)
+           
+            trans_table_1 = make_transtable(bases_src_1.replace("fasta", "txt"))
+            trans_table_2 = make_transtable(bases_src_2.replace("fasta", "txt"))
+
+            one_to_two = get_dir(file_1)
+            two_to_one = get_dir(file_2)
+
+            new_dict = comp_dicts(one_to_two, two_to_one)
+
+            for k, v in new_dict.iteritems():
+                alignment_name = make_align(k, v)
+                protein_to_bases(alignment_name, k, v)
