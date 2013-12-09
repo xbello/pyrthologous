@@ -14,8 +14,11 @@ def comp_dicts(dict_1, dict_2):
     d = {}
 
     for k, v in dict_1.iteritems():
-        if dict_2[v] == k:
-            d[k] = v
+        if dict_2.has_key(v):
+            if dict_2[v] == k:
+                d[k] = v
+        else:
+            "Dict 2 has no key %s" % v
 
     return d
 

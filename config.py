@@ -2,7 +2,12 @@ SEP = ";"
 MUSCLE = "/home/xbello/bin/muscle"
 
 BASE_PATH = "/opt/space/data/Parasitos/secuencias"
-LEAF_PATHS = ["Babesia", "Giardia", "Theileria", "Toxo"]
+LEAF_PATHS = [
+#    "Babesia",
+#    "Giardia",
+    "Theileria",
+#    "Toxo"
+]
 
 ORGANISMS = {"Bv": "Babesia_bovis",
     "Bm": "Babesia_microti",

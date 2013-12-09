@@ -1,0 +1,4 @@
+*.pyc
+outputs/
+to_send/
+DBBLAST.log
