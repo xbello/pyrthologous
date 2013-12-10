@@ -26,3 +26,14 @@ def select_genomes(src_dir, extension):
 
     if os.path.isdir(genome_src):
         return [x for x in os.listdir(genome_src) if x.endswith(extension)]
+
+
+def tag_fasta(fasta, tag="NORM"):
+    """Return a new name for a given fasta."""
+
+    if os.path.isfile(fasta):
+        new_fasta = list(os.path.split(os.path.abspath(fasta)))
+        # Tag the new filename
+        new_fasta[1] = new_fasta[1].split(".")[0] + "_" + tag + ".fas"
+
+        return os.path.join(*new_fasta)
