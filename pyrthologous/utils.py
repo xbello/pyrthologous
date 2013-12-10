@@ -2,13 +2,23 @@
 
 import itertools
 import os
-from .config import BASE_PATH
+from Bio import SeqIO
 
 
 def make_reciprocals(genomes):
     """Return a list of the permutations to generate from genomes."""
 
     return [x for x in itertools.combinations(genomes, 2)]
+
+
+def normalize(fasta_file):
+    """Yield a (id, head) for each line in a fasta file."""
+
+    seq_number = 1
+    if os.path.isfile(fasta_file):
+        for rec in SeqIO.parse(fasta_file, "fasta"):
+            yield seq_number, rec.name
+            seq_number += 1
 
 
 def reciprocal_genomes(src_dir, extension):
@@ -20,17 +30,16 @@ def reciprocal_genomes(src_dir, extension):
 
 
 def select_genomes(src_dir, extension):
-    """Return the files in src_dir relative to BASE_PATH with extension."""
+    """Return the files in src_dir ending with extension."""
 
-    genome_src = os.path.join(BASE_PATH, src_dir)
-
-    if os.path.isdir(genome_src):
-        return [x for x in os.listdir(genome_src) if x.endswith(extension)]
+    if os.path.isdir(src_dir):
+        return [x for x in os.listdir(src_dir) if x.endswith(extension)]
 
 
 def tag_fasta(fasta, tag="NORM"):
     """Return a new name for a given fasta."""
 
+    print fasta
     if os.path.isfile(fasta):
         new_fasta = list(os.path.split(os.path.abspath(fasta)))
         # Tag the new filename

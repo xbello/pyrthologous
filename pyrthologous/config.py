@@ -9,14 +9,18 @@ BLAST_DB_MAKER = "makeblastdb"
 
 SUFFIX = "NORM"
 SEP = ";"
-BASE_PATH = os.getcwd()
+BASE_PATH = os.path.join(os.getcwd())
 LEAF_PATHS = [
-    #"Babesia",
-    #"Giardia",
+    "Babesia",
+    "Giardia",
     "Theileria",
-    #"Toxo"
+    "Toxo"
 ]
 
+
+# This ORGANISMS dict relates a "real" genome filename with a shorting of it.
+# I.e. for a fasta called "Babesia_bovis.fas" we have a short of "Bv" in the
+# form of key:value dict like {"Bv": "Babesia_bovis"}
 ORGANISMS = {
     "Bv": "Babesia_bovis",
     "Bm": "Babesia_microti",
