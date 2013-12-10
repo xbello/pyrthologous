@@ -1,15 +1,24 @@
-SEP = ";"
-MUSCLE = "/home/xbello/bin/muscle"
+"""Config the user constants."""
+import os
 
+MUSCLE = os.path.expanduser("~/bin/muscle")
+
+BLAST_PATH = "/usr/bin/"
+BLASTP = os.path.join(BLAST_PATH, "blastp")
+BLAST_DB_MAKER = "makeblastdb"
+
+SUFFIX = "NORM"
+SEP = ";"
 BASE_PATH = "/opt/space/data/Parasitos/secuencias"
 LEAF_PATHS = [
-#    "Babesia",
-#    "Giardia",
+    #"Babesia",
+    #"Giardia",
     "Theileria",
-#    "Toxo"
+    #"Toxo"
 ]
 
-ORGANISMS = {"Bv": "Babesia_bovis",
+ORGANISMS = {
+    "Bv": "Babesia_bovis",
     "Bm": "Babesia_microti",
     "GA": "Giardia_A",
     "GB": "Giardia_B",
@@ -21,4 +30,3 @@ ORGANISMS = {"Bv": "Babesia_bovis",
     "TV": "Toxo_VE"}
 
 OUTPUT = "outputs"
-
