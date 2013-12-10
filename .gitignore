@@ -1,3 +1,4 @@
+*.swp
 *.py[cod]
 
 # C extensions
@@ -34,4 +35,3 @@ nosetests.xml
 .mr.developer.cfg
 .project
 .pydevproject
->>>>>>> f6885f4b009e42a9bfcc5007bf1d265115154c1f

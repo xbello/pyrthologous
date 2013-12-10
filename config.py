@@ -9,7 +9,7 @@ BLAST_DB_MAKER = "makeblastdb"
 
 SUFFIX = "NORM"
 SEP = ";"
-BASE_PATH = "/opt/space/data/Parasitos/secuencias"
+BASE_PATH = os.getcwd()
 LEAF_PATHS = [
     #"Babesia",
     #"Giardia",
