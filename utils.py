@@ -11,6 +11,14 @@ def make_reciprocals(genomes):
     return [x for x in itertools.combinations(genomes, 2)]
 
 
+def reciprocal_genomes(src_dir, extension):
+    """Return a list of the mutual searches to coduct."""
+
+    genomes = select_genomes(src_dir, extension)
+
+    return make_reciprocals(genomes)
+
+
 def select_genomes(src_dir, extension):
     """Return the files in src_dir relative to BASE_PATH with extension."""
 
