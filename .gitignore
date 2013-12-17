@@ -1,5 +1,7 @@
 *.swp
 *.py[cod]
+pyrthologous/Parasites
+*.log
 
 # C extensions
 *.so
@@ -8,6 +10,7 @@
 *.egg
 *.egg-info
 dist
+docs/build
 build
 eggs
 parts
@@ -16,6 +19,7 @@ var
 sdist
 develop-eggs
 .installed.cfg
+include
 lib
 lib64
 __pycache__
