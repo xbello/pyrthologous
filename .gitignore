@@ -22,6 +22,7 @@ develop-eggs
 include
 lib
 lib64
+man
 __pycache__
 
 # Installer logs
