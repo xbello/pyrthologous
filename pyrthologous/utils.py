@@ -2,7 +2,8 @@
 
 import itertools
 import os
-from Bio import SeqIO
+from Bio.Seq import Seq
+from Bio.SeqIO import parse
 
 
 def make_reciprocals(genomes):
@@ -16,7 +17,7 @@ def normalize(fasta_file):
 
     seq_number = 1
     if os.path.isfile(fasta_file):
-        for rec in SeqIO.parse(fasta_file, "fasta"):
+        for rec in parse(fasta_file, "fasta"):
             yield seq_number, rec.name
             seq_number += 1
 
@@ -46,3 +47,10 @@ def tag_fasta(fasta, tag="NORM"):
         new_fasta[1] = new_fasta[1].split(".")[0] + "_" + tag + ".fas"
 
         return os.path.join(*new_fasta)
+
+
+def translate(seq):
+    """Return the translated sequence in seq string."""
+
+    sequence = Seq(seq)
+    return str(sequence.translate())

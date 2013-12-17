@@ -9,8 +9,10 @@ from .. import blast
 class testBlast(TestCase):
     def setUp(self):
         self.tgt_path = "tests/mock_genome"
-        self.prots = os.path.abspath(os.path.join(self.tgt_path, "prot1.fas"))
-        self.seq1 = os.path.abspath(os.path.join(self.tgt_path, "prot2.fas"))
+        self.prots = os.path.abspath(
+            os.path.join(self.tgt_path, "prot1.fasta"))
+        self.seq1 = os.path.abspath(
+            os.path.join(self.tgt_path, "prot2.fasta"))
 
         self.blast_output = "\n".join([
             "".join(["Protein_query\tProt2\t99.33\t300\t0\t2",

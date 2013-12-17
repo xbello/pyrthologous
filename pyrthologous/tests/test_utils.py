@@ -45,3 +45,10 @@ class testUtils(TestCase):
         self.assertEqual(
             utils.tag_fasta(join(tc.BASE_PATH, "1.fas"), tag="MOCK"),
             abspath("tests/mock_genome/1_MOCK.fas"))
+
+    def test_translate(self):
+        self.assertEqual(
+            utils.translate("ATG"), "M")
+        self.assertEqual(
+            utils.translate("AAGGAGAGGGAGAGAGAGCAGGAACGATGTTCTTCC"),
+            "KEREREQERCSS")
