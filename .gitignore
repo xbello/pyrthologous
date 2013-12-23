@@ -2,6 +2,9 @@
 *.py[cod]
 pyrthologous/Parasites
 *.log
+docs/build
+docs/Makefile
+docs/man
 
 # C extensions
 *.so
