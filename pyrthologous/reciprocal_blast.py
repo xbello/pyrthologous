@@ -1,12 +1,10 @@
-#!/usr/bin/env python
 import os
+import subprocess
 from config import SUFFIX, BLASTP, BLAST_DB_MAKER
 
 
 def blastp(query, subject):
-    '''String, String -> Bool
-
-    Make a blastp between query and subject'''
+    """Make a blastp between query and subject."""
 
     os.system("{0} -query {1} -db {2} -outfmt 6 -max_target_seqs 1".format(
         BLASTP, query, subject))

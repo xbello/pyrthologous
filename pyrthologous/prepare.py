@@ -1,6 +1,8 @@
 """Prepare the files in the input to start the analysis."""
 
-from .config import BASE_PATH, GENOMES
+from Bio import SeqIO
+
+from .config import BASE_PATH, GENOMES, OUTPUT
 import os
 
 
@@ -10,3 +12,11 @@ def get_fasta_names(path=""):
         path = os.path.join(BASE_PATH, GENOMES)
 
     return [z for x, y, z in os.walk(path)][0]
+
+
+def translate_fasta(fasta_path, output_path):
+    """Make a translate file from a file fasta."""
+
+    records = SeqIO.parse(fasta_path, "fasta")
+
+

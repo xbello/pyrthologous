@@ -4,7 +4,6 @@ from Bio import SeqIO
 
 from config import SEP, MUSCLE
 
-muscle = "/home/xbello/bin/muscle"
 
 def comp_dicts(dict_1, dict_2):
     '''Dict, Dict -> Dict
@@ -33,7 +32,7 @@ def get_dir(tab_blast_output):
         for line in tab_blast:
             data = line.split("\t")
             d[data[0]] = data[1]
-            
+
     return d
 
 def get_seq_from_fasta(seq_id, fasta_file):
@@ -117,7 +116,7 @@ def protein_to_bases(alignment, seq_id1, seq_id2):
     handle.close()
 
     return True
-    
+
 def seq_aa_to_bases(seq_aa, seq_bases):
     '''String, String -> String
 
@@ -151,7 +150,7 @@ if __name__ == "__main__":
 
             organism_1_abbr = "".join([x[0] for x in organism_1.split("_")])
             organism_2_abbr = "".join([x[0] for x in organism_2.split("_")])
-        
+
             file_1 = os.path.join(
                 config.OUTPUT,
                 "_vs_".join([organism_1_abbr, organism_2_abbr]) + ".blast")
@@ -172,7 +171,7 @@ if __name__ == "__main__":
 
             align_dir = "_vs_".join([organism_1_abbr, organism_2_abbr])
             if not os.path.isdir(align_dir): os.mkdir(align_dir)
-           
+
             trans_table_1 = make_transtable(bases_src_1.replace("fasta", "txt"))
             trans_table_2 = make_transtable(bases_src_2.replace("fasta", "txt"))
 
