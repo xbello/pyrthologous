@@ -2,8 +2,8 @@
 
 import itertools
 import os
-from Bio.Seq import Seq
 from Bio.SeqIO import parse
+from Bio.SeqRecord import SeqRecord
 
 
 def make_reciprocals(genomes):
@@ -40,7 +40,6 @@ def select_genomes(src_dir, extension):
 def tag_fasta(fasta, tag="NORM"):
     """Return a new name for a given fasta."""
 
-    print fasta
     if os.path.isfile(fasta):
         new_fasta = list(os.path.split(os.path.abspath(fasta)))
         # Tag the new filename
@@ -49,8 +48,11 @@ def tag_fasta(fasta, tag="NORM"):
         return os.path.join(*new_fasta)
 
 
-def translate(seq):
-    """Return the translated sequence in seq string."""
+def translate(seqs):
+    """Return the translated sequence in seqs Seq records."""
 
-    sequence = Seq(seq)
-    return str(sequence.translate())
+    for sequence in seqs:
+        new_record = SeqRecord(sequence.seq.translate(),
+                               id=sequence.id,
+                               description="")
+        yield new_record

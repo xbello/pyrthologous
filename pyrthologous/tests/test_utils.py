@@ -1,5 +1,7 @@
 """Test the misc functions in utils."""
 
+from Bio.SeqRecord import SeqRecord
+from Bio.Seq import Seq
 from unittest import TestCase
 from collections import Counter
 from os.path import abspath, join
@@ -47,8 +49,13 @@ class testUtils(TestCase):
             abspath("tests/mock_genome/1_MOCK.fas"))
 
     def test_translate(self):
-        self.assertEqual(
-            utils.translate("ATG"), "M")
-        self.assertEqual(
-            utils.translate("AAGGAGAGGGAGAGAGAGCAGGAACGATGTTCTTCC"),
-            "KEREREQERCSS")
+        seq1 = SeqRecord(Seq("ATG"), id="Single Amino")
+        seq2 = SeqRecord(Seq("AAGGAGAGGGAGAGAGAGCAGGAACGATGTTCTTCC"),
+                         id="Multiple Aminos")
+
+        recs = [x for x in utils.translate([seq1, seq2])]
+
+        self.assertEqual(str(recs[0].seq), "M")
+        self.assertEqual(str(recs[1].seq), "KEREREQERCSS")
+
+        self.assertEqual(recs[0].id, "Single Amino")
