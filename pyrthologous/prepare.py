@@ -2,7 +2,8 @@
 
 from Bio import SeqIO
 
-from .config import BASE_PATH, GENOMES, OUTPUT
+from .config import BASE_PATH, GENOMES
+from .utils import translate
 import os
 
 
@@ -18,5 +19,14 @@ def translate_fasta(fasta_path, output_path):
     """Make a translate file from a file fasta."""
 
     records = SeqIO.parse(fasta_path, "fasta")
+    # Create a new fasta file to save the output
+    output = open(
+        os.path.join(output_path,
+                     os.path.basename(fasta_path)),
+        "w")
 
+    SeqIO.write(translate(records),
+                output,
+                "fasta")
 
+    output.close()
