@@ -1,3 +1,5 @@
+"""Test for prepare.py module."""
+
 import os
 from collections import Counter
 from unittest import TestCase
@@ -22,6 +24,18 @@ class testPrepare(TestCase):
                                    "mock_genome")
 
         fasta_path = os.path.join(genome_path, "1.fas")
+        output_file = os.path.join(genome_path, "output", "1.fas")
 
+        os.unlink(output_file)
+
+        self.assertFalse(os.path.isfile(output_file))
         prepare.translate_fasta(fasta_path,
                                 os.path.join(genome_path, "output"))
+        self.assertTrue(os.path.isfile(output_file))
+
+        trans_file = open(output_file, "r").readlines()
+
+        self.assertEqual(trans_file[0].strip(),
+                         ">6_BEWA_012860_804_signal")
+        self.assertEqual(trans_file[1].strip()[:20], "MKKCVSSSIIALFTLFISTG")
+        self.assertEqual(trans_file[-1].strip()[:20], "AYNEARLVSKHINKLLEVDV")
