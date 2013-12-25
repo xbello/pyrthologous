@@ -26,7 +26,8 @@ class testPrepare(TestCase):
         fasta_path = os.path.join(genome_path, "1.fas")
         output_file = os.path.join(genome_path, "output", "1.fas")
 
-        os.unlink(output_file)
+        if not os.path.exists(os.path.dirname(output_file)):
+            os.mkdir(os.path.dirname(output_file))
 
         self.assertFalse(os.path.isfile(output_file))
         prepare.translate_fasta(fasta_path,
@@ -39,3 +40,5 @@ class testPrepare(TestCase):
                          ">6_BEWA_012860_804_signal")
         self.assertEqual(trans_file[1].strip()[:20], "MKKCVSSSIIALFTLFISTG")
         self.assertEqual(trans_file[-1].strip()[:20], "AYNEARLVSKHINKLLEVDV")
+
+        os.unlink(output_file)

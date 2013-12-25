@@ -12,21 +12,19 @@ def get_fasta_names(path=""):
     if not path:
         path = os.path.join(BASE_PATH, GENOMES)
 
-    return [z for x, y, z in os.walk(path)][0]
+    return [x[2] for x in os.walk(path)][0]
 
 
 def translate_fasta(fasta_path, output_path):
-    """Make a translate file from a file fasta."""
+    """Return True if can make a translate file from a file fasta."""
 
     records = SeqIO.parse(fasta_path, "fasta")
     # Create a new fasta file to save the output
     output = open(
-        os.path.join(output_path,
-                     os.path.basename(fasta_path)),
-        "w")
+        os.path.join(output_path, os.path.basename(fasta_path)), "w")
 
-    SeqIO.write(translate(records),
-                output,
-                "fasta")
+    SeqIO.write(translate(records), output, "fasta")
 
     output.close()
+
+    return True
