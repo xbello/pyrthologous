@@ -15,6 +15,22 @@ def get_fasta_names(path=""):
     return [x[2] for x in os.walk(path)][0]
 
 
+def set_pairs(pair_line):
+    """Return a tuple with the filenames of the files to be compared.
+    
+    Files to be compared are strings with the names of the fasta files joined
+    with '_', valid formats are::
+	    
+      1_vs_2
+      1_to_2
+      1_2
+      
+    When the target files are 1.fas and 2.fas."""
+
+    pairs = [x + ".fas" for x in pair_line.split("_")]
+
+    return (pairs[0], pairs[-1])
+
 def translate_fasta(fasta_path, output_path):
     """Return True if can make a translate file from a file fasta."""
 
