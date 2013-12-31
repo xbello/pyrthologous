@@ -1,4 +1,8 @@
-from ConfigParser import ConfigParser
+from sys import version_info
+if version_info.major >= 3:
+    from configparser import ConfigParser
+else:
+    from ConfigParser import ConfigParser
 import os
 
 from . import prepare
@@ -6,7 +10,7 @@ from . import prepare
 def config_parse(config_file):
     """Return the module with the values in config."""
    
-    print config_file
+    #print config_file
     if not os.path.isfile(config_file):
         return False
 

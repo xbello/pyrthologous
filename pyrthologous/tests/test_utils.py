@@ -7,7 +7,7 @@ from collections import Counter
 from os.path import abspath, join
 from .. import utils
 
-import test_config as tc
+from . import test_config as tc
 
 
 class testUtils(TestCase):

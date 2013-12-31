@@ -20,12 +20,12 @@ class testPrepare(TestCase):
                          Counter(self.fastas))
 
     def test_set_pairs(self):
-	pair_line = "1_vs_2"
+        pair_line = "1_vs_2"
 
-	self.assertEqual(prepare.set_pairs("1_vs_2"),
-			("1.fas", "2.fas"))
-	self.assertEqual(prepare.set_pairs("1_v_2"),
-			("1.fas", "2.fas"))
+        self.assertEqual(prepare.set_pairs("1_vs_2"),
+                         ("1.fas", "2.fas"))
+        self.assertEqual(prepare.set_pairs("1_v_2"),
+                         ("1.fas", "2.fas"))
 
     def test_translate_fasta(self):
         genome_path = os.path.join(os.path.dirname(__file__),
@@ -50,4 +50,4 @@ class testPrepare(TestCase):
         self.assertEqual(trans_file[-1].strip()[:20], "AYNEARLVSKHINKLLEVDV")
 
         os.unlink(output_file)
-	os.rmdir(os.path.dirname(output_file))
+        os.rmdir(os.path.dirname(output_file))
