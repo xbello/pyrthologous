@@ -13,7 +13,7 @@ BASE_PATH = os.path.join(os.getcwd())
 # This is where the genomes are relative to BASE_PATH:
 GENOMES = "Parasites"
 
-OUTPUT = "outputs"
+OUTPUT = "Parasites_output"
 
 COMPARE = (
     ("E_cuniculi.fasta", "E_intestinalis.fasta"),
