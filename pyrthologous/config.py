@@ -5,7 +5,7 @@ MUSCLE = os.path.expanduser("~/bin/muscle")
 
 BLAST_PATH = "/usr/bin/"
 BLASTP = os.path.join(BLAST_PATH, "blastp")
-BLAST_DB_MAKER = "makeblastdb"
+BLAST_DB_MAKER = os.path.join(BLAST_PATH, "makeblastdb")
 
 SUFFIX = "NORM"
 SEP = ";"

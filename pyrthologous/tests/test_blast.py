@@ -14,13 +14,8 @@ class testBlast(TestCase):
         self.seq1 = os.path.abspath(
             os.path.join(self.tgt_path, "prot2.fasta"))
 
-        self.blast_output = "\n".join([
-            "".join(["Protein_query\tProt2\t99.33\t300\t0\t2",
-                     "\t122\t420\t2\t300\t0.0\t 626"]),
-            "".join(["Protein_query\tProt2\t21.88\t64\t30\t1",
-                     "\t74\t137\t175\t218\t1.8\t16.9"]),
-            "".join(["Protein_query\tProt2\t33.33\t18\t12\t0",
-                     "\t37\t54\t331\t348\t6.9\t15.4\n"])])
+        self.blast_output = "Protein_query\tProt2\t99.33\t300\t0\t2" +\
+            "\t122\t420\t2\t300\t0.0\t 626\n"
 
     def tearDown(self):
         for filep in os.listdir(self.tgt_path):
@@ -28,12 +23,12 @@ class testBlast(TestCase):
                 os.unlink(os.path.join(self.tgt_path, filep))
 
     def test_blastp(self):
-        db = blast.make_blast_db(self.prots, os.path.join(self.tgt_path,
-                                                          "prots"))
+        db = blast.make_blast_db(self.prots,
+                                 os.path.join(self.tgt_path, "prots"))
 
         self.assertEqual(
             blast.blastp(self.seq1, db),
-            (self.blast_output, ""))
+            (self.blast_output, ''))
 
     def test_make_blast_db(self):
         self.assertEqual(

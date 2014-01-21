@@ -2,7 +2,7 @@
 
 import os
 import subprocess
-from pyrthologous.config import BLASTP, BLAST_DB_MAKER
+from .config import BLASTP, BLAST_DB_MAKER
 
 
 def blastp(query, subject):

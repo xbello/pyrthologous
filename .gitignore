@@ -1,6 +1,6 @@
 *.swp
 *.py[cod]
-pyrthologous/Parasites
+Parasites
 *.log
 docs/build
 docs/Makefile
