@@ -1,6 +1,7 @@
 *.swp
 *.py[cod]
 Parasites
+*~
 *.log
 docs/build
 docs/Makefile

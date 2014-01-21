@@ -75,3 +75,4 @@ class testPrepare(TestCase):
         self.assertEqual(trans_file[-1].strip()[:20], "AYNEARLVSKHINKLLEVDV")
 
         os.unlink(output_file)
+        os.rmdir(os.path.dirname(output_file))
