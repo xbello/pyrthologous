@@ -14,3 +14,8 @@ BASE_PATH = os.path.join(os.getcwd())
 GENOMES = "Parasites"
 
 OUTPUT = "outputs"
+
+COMPARE = (
+    ("E_cuniculi.fasta", "E_intestinalis.fasta"),
+    ("E_dispar.fasta", "E_moshkovskii.fasta"),
+    ("E_hellem.fasta", "E_romaleae.fasta"))

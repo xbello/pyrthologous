@@ -10,13 +10,24 @@ from .. import prepare
 class testPrepare(TestCase):
     def setUp(self):
         self.genome = "mock_genome"
+        self.genome_path = os.path.join(os.path.dirname(__file__), self.genome)
         self.fastas = ["1.fas", "2.fas", "3.fas",
                        "prot1.fasta", "prot2.fasta"]
 
-    def test_get_fasta_names(self):
-        path = os.path.join(os.path.dirname(__file__), self.genome)
+    def test_check_compare(self):
+        self.assertTrue(prepare.check_compare(path=self.genome_path,
+                                              compare=(("1.fas", "2.fas"),
+                                                       ("2.fas", "3.fas"))
+                                              ))
+        self.assertRaises(AssertionError,
+                          prepare.check_compare,
+                          *[],
+                          **{"path": self.genome_path,
+                             "compare": (("4.fas", "2.fas"),)})
 
-        self.assertEqual(Counter(prepare.get_fasta_names(path)),
+    def test_get_fasta_names(self):
+
+        self.assertEqual(Counter(prepare.get_fasta_names(self.genome_path)),
                          Counter(self.fastas))
 
     def test_translate_fasta(self):

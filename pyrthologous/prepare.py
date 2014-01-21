@@ -2,9 +2,26 @@
 
 from Bio import SeqIO
 
-from .config import BASE_PATH, GENOMES
+from .config import BASE_PATH, COMPARE, GENOMES
 from .utils import translate
 import os
+
+
+def check_compare(path="", compare=()):
+    """Return True if all the genomes in compare exists in path."""
+    if not path:
+        path = os.path.join(BASE_PATH, GENOMES)
+
+    if not compare:
+        compare = COMPARE
+
+    available_genomes = get_fasta_names(path=path)
+
+    for first, second in compare:
+        assert first in available_genomes
+        assert second in available_genomes
+
+    return True
 
 
 def get_fasta_names(path=""):
