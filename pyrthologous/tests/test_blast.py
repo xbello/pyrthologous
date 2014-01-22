@@ -8,7 +8,7 @@ from .. import blast
 
 class testBlast(TestCase):
     def setUp(self):
-        self.tgt_path = "tests/mock_genome"
+        self.tgt_path = os.path.join(os.path.dirname(__file__), "mock_genome")
         self.prots = os.path.abspath(
             os.path.join(self.tgt_path, "prot1.fasta"))
         self.seq1 = os.path.abspath(
@@ -34,6 +34,6 @@ class testBlast(TestCase):
 
     def test_make_blast_db(self):
         self.assertEqual(
-            blast.make_blast_db(self.prots, os.path.join(self.tgt_path,
-                                                         "prots")),
+            blast.make_blast_db(self.prots,
+                                os.path.join(self.tgt_path, "prots")),
             os.path.join(self.tgt_path, "prots"))

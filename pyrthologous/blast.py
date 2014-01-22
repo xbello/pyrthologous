@@ -27,7 +27,7 @@ def make_blast_db(src, tgt):
 
     command = [BLAST_DB_MAKER,
                "-in", src,
-               "-out", os.path.join(os.getcwd(), tgt),
+               "-out", tgt,
                "-dbtype", "prot",
                "-logfile", "DBBLAST.log"]
 
