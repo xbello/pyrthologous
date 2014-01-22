@@ -37,3 +37,5 @@ class testBlast(TestCase):
             blast.make_blast_db(self.prots,
                                 os.path.join(self.tgt_path, "prots")),
             os.path.join(self.tgt_path, "prots"))
+
+    def test_reci
