@@ -13,8 +13,10 @@ def blastp(query, subject):
     command = [BLASTP,
                "-query", query,
                "-db", subject,
-               "-outfmt", "6",
-               "-max_target_seqs", "1"]
+               "-outfmt", "6"]
+               # XXX This flag have erratical behaviour among BLAST versions
+               # 2.2.27+ output differs from 2.2.28+
+               #"-max_target_seqs", "1"]
 
     p = subprocess.Popen(command,
                          stdout=subprocess.PIPE,
@@ -67,6 +69,7 @@ def listify_blast_output(blast_output, casts=[]):
     for match_line in blast_output.rstrip().split("\n"):
         new_line = match_line.split("\t")
         for cast in casts:
+            # Cast the columns in "casts" to types for further comparisons
             new_line[cast[0]] = getattr(
                 __builtin__, cast[1])(new_line[cast[0]])
         return_list.append(new_line)
@@ -110,6 +113,7 @@ def simplify_blast_output(blast_list=[],
     QUERY = 0
     IDENTITY = 2
 
+
     if not blast_list:
         # Process the last group
         best_matches.append(get_best_from_group(group, IDENTITY))
@@ -135,3 +139,27 @@ def simplify_blast_output(blast_list=[],
                               best_matches=best_matches)
 
     return best_matches
+
+
+def s_b_o(blast_list=[], group=[]):
+    """Generator that yield the best result for each group of lines."""
+
+    # Identify the columns
+    QUERY = 0
+    IDENTITY = 2
+
+    # If there are lines left to process...
+    while blast_list:
+        # Pop the first line in the batch
+        this_line = blast_list.pop(0)
+        group.append(this_line)
+
+        if not blast_list or (blast_list[0][QUERY] != this_line[QUERY]):
+            # List has been just exhausted or the next line is a new group
+            # Either two options: process current group, yield and continue
+            yield get_best_from_group(group, IDENTITY)
+            group = []
+
+        # Recurse the function while blast_list isn't exhausted
+        for x in s_b_o(blast_list=blast_list, group=group):
+            yield x

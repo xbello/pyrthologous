@@ -91,8 +91,8 @@ class testBlast(TestCase):
         # Multiline, with casting second columnt to float
         list_blast_output = [x.split("\t") for x in
                              self.blast_output2.rstrip().split("\n")]
-        for i, line in enumerate(list_blast_output):
-            list_blast_output[i][2] = float(list_blast_output[i][2])
+        for i in list_blast_output:
+            i[2] = float(i[2])
 
         self.assertEqual(blast.listify_blast_output(
             self.blast_output2, casts=[(2, "float")]),
@@ -104,7 +104,6 @@ class testBlast(TestCase):
                          self.blast_output)
 
         #Multiple groups
-
         self.assertEqual(blast.get_best_from_blast_output(self.blast_output3),
                          self.blast_output_two_best)
 
@@ -124,4 +123,14 @@ class testBlast(TestCase):
         self.assertEqual(blast.simplify_blast_output(
             blast_list=output_as_list,
             group=[], best_matches=[]),
+            [x.split("\t") for x in self.blast_output_two_best.split("\n")])
+
+    def test_s_b_o(self):
+        output_as_list = [x.split("\t") for x in
+                          self.blast_output3.split("\n")]
+
+        bests = [x for x in blast.s_b_o(blast_list=output_as_list, group=[])]
+
+        self.assertEqual(
+            bests,
             [x.split("\t") for x in self.blast_output_two_best.split("\n")])
