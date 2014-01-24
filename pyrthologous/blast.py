@@ -37,7 +37,7 @@ def make_blast_db(src, tgt):
 
     if not os.path.isdir(tgt):
         os.mkdir(tgt)
-        tgt = os.path.join(tgt, os.path.basename(src))
+    tgt = os.path.join(tgt, os.path.basename(src))
 
     command = [BLAST_DB_MAKER,
                "-in", src,
@@ -65,7 +65,7 @@ def reciprocal_blastp(query_subject):
 
         # Blast'em
         stdout, stderr = blastp(query, db)
-        # TODO: delete the database
+
         # Yield and repeat
         yield stdout, stderr
 

@@ -83,9 +83,6 @@ class testBlast(TestCase):
         self.assertEqual(set(stdouts),
                          set([self.blast_output, self.blast_output_two_best]))
 
-    def test_reciprocal_blastp_trash(self):
-        pass
-
     def test_listify_blast_output(self):
         # Only one line, no casting
         list_blast_output = [self.blast_output.split("\t")]
