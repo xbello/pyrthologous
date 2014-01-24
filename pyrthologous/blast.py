@@ -87,11 +87,9 @@ def get_best_from_blast_output(blast_output):
     blast_list = listify_blast_output(
         blast_output, casts=[(IDENTITY, "float")])
 
-    best_matches = simplify_blast_output(blast_list=blast_list,
-                                         group=[],
-                                         best_matches=[])
-
-    return "\n".join(["\t".join([str(x) for x in y]) for y in best_matches])
+    return "\n".join(
+        ["\t".join([str(x) for x in y])
+         for y in simplify_blast_output(blast_list=blast_list, group=[])])
 
 
 def get_best_from_group(blast_list, position):
@@ -104,44 +102,7 @@ def get_best_from_group(blast_list, position):
     return best_match
 
 
-def simplify_blast_output(blast_list=[],
-                          group=[],
-                          best_matches=[]):
-    """Return only the best match for each group of matches."""
-
-    # Identify the columns
-    QUERY = 0
-    IDENTITY = 2
-
-
-    if not blast_list:
-        # Process the last group
-        best_matches.append(get_best_from_group(group, IDENTITY))
-    else:
-        this_line = blast_list.pop(0)
-        if not group:
-            # Start a new group
-            group.append(this_line)
-        else:
-            # A group has been initialized
-            if this_line[QUERY] == group[0][QUERY]:
-                # The line is in the same group, add and continue
-                group.append(this_line)
-            else:
-                # The line is the first of a new group
-                # Get the best line of the group
-                best_matches.append(get_best_from_group(group, IDENTITY))
-                # Start a new group
-                group = [this_line]
-
-        simplify_blast_output(blast_list=blast_list,
-                              group=group,
-                              best_matches=best_matches)
-
-    return best_matches
-
-
-def s_b_o(blast_list=[], group=[]):
+def simplify_blast_output(blast_list=[], group=[]):
     """Generator that yield the best result for each group of lines."""
 
     # Identify the columns
@@ -161,5 +122,5 @@ def s_b_o(blast_list=[], group=[]):
             group = []
 
         # Recurse the function while blast_list isn't exhausted
-        for x in s_b_o(blast_list=blast_list, group=group):
+        for x in simplify_blast_output(blast_list=blast_list, group=group):
             yield x

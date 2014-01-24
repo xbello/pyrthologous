@@ -111,25 +111,19 @@ class testBlast(TestCase):
         # One group get simplified to its best line
         output_as_list = [x.split("\t") for x in
                           self.blast_output2.split("\n")]
-        self.assertEqual(blast.simplify_blast_output(
-            blast_list=output_as_list,
-            group=[], best_matches=[]),
+
+        bests = [x for x in blast.simplify_blast_output(
+            blast_list=output_as_list, group=[])]
+
+        self.assertEqual(bests,
             [self.blast_output.split("\t")])
 
-    def test_simplify_blast_output_with_2(self):
-        # Multiple groups get simplified to its bests lines each
-        output_as_list = [x.split("\t") for x in
-                          self.blast_output3.split("\n")]
-        self.assertEqual(blast.simplify_blast_output(
-            blast_list=output_as_list,
-            group=[], best_matches=[]),
-            [x.split("\t") for x in self.blast_output_two_best.split("\n")])
-
-    def test_s_b_o(self):
+        # Multiple groups simplified to its best lines
         output_as_list = [x.split("\t") for x in
                           self.blast_output3.split("\n")]
 
-        bests = [x for x in blast.s_b_o(blast_list=output_as_list, group=[])]
+        bests = [x for x in blast.simplify_blast_output(
+            blast_list=output_as_list, group=[])]
 
         self.assertEqual(
             bests,
