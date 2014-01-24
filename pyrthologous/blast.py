@@ -6,6 +6,10 @@ import subprocess
 from operator import itemgetter
 from .config import BLASTP, BLAST_DB_MAKER, OUTPUT
 
+# Globals for column positions of tab-blast output
+QUERY = 0
+IDENTITY = 2
+
 
 def blastp(query, subject):
     """Return the output for a blast from query to subject."""
@@ -80,10 +84,6 @@ def listify_blast_output(blast_output, casts=[]):
 def get_best_from_blast_output(blast_output):
     """Return only the best matches for each group of matches."""
 
-    # Identify the columns
-    # TODO: These seems to be globals here
-    IDENTITY = 2
-
     blast_list = listify_blast_output(
         blast_output, casts=[(IDENTITY, "float")])
 
@@ -104,10 +104,6 @@ def get_best_from_group(blast_list, position):
 
 def simplify_blast_output(blast_list=[], group=[]):
     """Generator that yield the best result for each group of lines."""
-
-    # Identify the columns
-    QUERY = 0
-    IDENTITY = 2
 
     # If there are lines left to process...
     while blast_list:
