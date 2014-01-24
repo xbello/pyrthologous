@@ -35,6 +35,10 @@ def blastp(query, subject):
 def make_blast_db(src, tgt):
     """Return the Database name created from ``src``."""
 
+    if not os.path.isdir(tgt):
+        os.mkdir(tgt)
+        tgt = os.path.join(tgt, os.path.basename(src))
+
     command = [BLAST_DB_MAKER,
                "-in", src,
                "-out", tgt,
@@ -58,6 +62,7 @@ def reciprocal_blastp(query_subject):
         # Make the database
         db = make_blast_db(subject,
                            os.path.join(os.path.dirname(subject), OUTPUT))
+
         # Blast'em
         stdout, stderr = blastp(query, db)
         # TODO: delete the database

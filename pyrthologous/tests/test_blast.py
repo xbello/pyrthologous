@@ -1,9 +1,11 @@
 """Test for module blast."""
 
 import os
+import shutil
 from unittest import TestCase
 
 from .. import blast
+from .. import config
 
 
 class testBlast(TestCase):
@@ -48,6 +50,9 @@ class testBlast(TestCase):
         for filep in os.listdir(self.tgt_path):
             if filep.endswith((".phr", ".pin", ".psq")):
                 os.unlink(os.path.join(self.tgt_path, filep))
+            if os.path.isdir(os.path.join(self.tgt_path, filep)):
+                if filep in ["prots", config.OUTPUT]:
+                    shutil.rmtree(os.path.join(self.tgt_path, filep))
 
     def test_blastp(self):
         """Test blastp output: shown blastp output vs expected output."""
@@ -63,9 +68,11 @@ class testBlast(TestCase):
         self.assertEqual(
             blast.make_blast_db(self.prots,
                                 os.path.join(self.tgt_path, "prots")),
-            os.path.join(self.tgt_path, "prots"))
+            os.path.join(self.tgt_path,
+                         "prots",
+                         os.path.basename(self.prots)))
 
-    def test_reciprocal_blastp(self):
+    def test_reciprocal_blastp_outputs(self):
         pair = (self.prots, self.prot2)
         stdouts, stderrs = zip(*[x for x in blast.reciprocal_blastp(pair)])
 
@@ -75,6 +82,9 @@ class testBlast(TestCase):
         # Assert the output is correct (regardless of the order)
         self.assertEqual(set(stdouts),
                          set([self.blast_output, self.blast_output_two_best]))
+
+    def test_reciprocal_blastp_trash(self):
+        pass
 
     def test_listify_blast_output(self):
         # Only one line, no casting
@@ -115,8 +125,7 @@ class testBlast(TestCase):
         bests = [x for x in blast.simplify_blast_output(
             blast_list=output_as_list, group=[])]
 
-        self.assertEqual(bests,
-            [self.blast_output.split("\t")])
+        self.assertEqual(bests, [self.blast_output.split("\t")])
 
         # Multiple groups simplified to its best lines
         output_as_list = [x.split("\t") for x in
