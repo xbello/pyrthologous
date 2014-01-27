@@ -1,36 +1,25 @@
-from sys import version_info
-if version_info.major >= 3:
-    from configparser import ConfigParser
-else:
-    from ConfigParser import ConfigParser
+"""Run all the functions with the genomes."""
+
 import os
 
-from . import prepare
+from .config import *
+from .prepare import translate_fasta
 
-def config_parse(config_file):
-    """Return the module with the values in config."""
-   
-    #print config_file
-    if not os.path.isfile(config_file):
-        return False
-
-    cfg = ConfigParser()
-    cfg.read(config_file)
-
-    d = {}
-    for section in cfg.sections():
-        d[section] = dict(cfg.items(section))
-
-    return d
 
 if __name__ == "__main__":
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument("config", help="Name of the config file.")
-    parser.add_argument("pairs", help="Name of the pairs file.")
+    for pair in COMPARE:
+        # Test if the files exists
+        for specie in pair:
+            if not os.path.isfile(os.path.join(BASE_PATH, GENOMES, specie)):
+                print os.path.join(BASE_PATH, GENOMES, specie)
+                raise IOError("File {0} doesn't exist".format(specie))
 
-    args = parser.parse_args()
+            # Translate both genomes
+            translate_fasta(os.path.join(BASE_PATH, GENOMES, specie),
+                            output_path=os.path.join(BASE_PATH, OUTPUT))
 
-    # Step 1: get the source of the genomes
-    if args.config:
-        cfg = config_parse(args.config)
+        # TODO: Reciprocal blast'em
+        # TODO: Select best matches and write'm out
+        # TODO: Align the matches
+        # TODO: Un-translate the sequences
+        # TODO: Pack the results and clean the house
