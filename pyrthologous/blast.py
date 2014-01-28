@@ -27,6 +27,9 @@ def blastp(query, subject):
                          stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
+    if stderr:
+        raise IOError(stderr)
+
     stdout = get_best_from_blast_output(stdout)
 
     return stdout, stderr
