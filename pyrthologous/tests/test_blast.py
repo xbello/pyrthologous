@@ -85,14 +85,16 @@ class testBlast(TestCase):
 
     def test_listify_blast_output(self):
         # Only one line, no casting
-        list_blast_output = [self.blast_output.split("\t")]
+        list_blast_output = self.blast_output.split("\t")
         self.assertEqual(
-            blast.listify_blast_output(self.blast_output), list_blast_output)
+            blast.listify_blast_output(self.blast_output).next(),
+            list_blast_output)
 
         # Cast the second column to a float
-        list_blast_output[0][2] = float(list_blast_output[0][2])
-        self.assertEqual(blast.listify_blast_output(
-            self.blast_output, casts=[(2, "float")]),
+        list_blast_output[2] = float(list_blast_output[2])
+        self.assertEqual(
+            blast.listify_blast_output(
+                self.blast_output, casts=[(2, "float")]).next(),
             list_blast_output)
 
         # Multiline, with casting second columnt to float
@@ -101,8 +103,9 @@ class testBlast(TestCase):
         for i in list_blast_output:
             i[2] = float(i[2])
 
-        self.assertEqual(blast.listify_blast_output(
-            self.blast_output2, casts=[(2, "float")]),
+        self.assertItemsEqual(
+            [x for x in blast.listify_blast_output(
+                self.blast_output2, casts=[(2, "float")])],
             list_blast_output)
 
     def test_get_best_from_blast_output(self):
@@ -116,8 +119,8 @@ class testBlast(TestCase):
 
     def test_simplify_blast_output(self):
         # One group get simplified to its best line
-        output_as_list = [x.split("\t") for x in
-                          self.blast_output2.split("\n")]
+        output_as_list = (x.split("\t") for x in
+                          self.blast_output2.split("\n"))
 
         bests = [x for x in blast.simplify_blast_output(
             blast_list=output_as_list, group=[])]
@@ -125,8 +128,8 @@ class testBlast(TestCase):
         self.assertEqual(bests, [self.blast_output.split("\t")])
 
         # Multiple groups simplified to its best lines
-        output_as_list = [x.split("\t") for x in
-                          self.blast_output3.split("\n")]
+        output_as_list = (x.split("\t") for x in
+                          self.blast_output3.split("\n"))
 
         bests = [x for x in blast.simplify_blast_output(
             blast_list=output_as_list, group=[])]

@@ -74,9 +74,7 @@ def reciprocal_blastp(query_subject):
 
 
 def listify_blast_output(blast_output, casts=[]):
-    """Return a list wit the blast output."""
-
-    return_list = []
+    """Return a list with the blast output."""
 
     for match_line in blast_output.rstrip().split("\n"):
         new_line = match_line.split("\t")
@@ -84,9 +82,8 @@ def listify_blast_output(blast_output, casts=[]):
             # Cast the columns in "casts" to types for further comparisons
             new_line[cast[0]] = getattr(
                 __builtin__, cast[1])(new_line[cast[0]])
-        return_list.append(new_line)
 
-    return return_list
+        yield new_line
 
 
 def get_best_from_blast_output(blast_output):
@@ -94,6 +91,9 @@ def get_best_from_blast_output(blast_output):
 
     blast_list = listify_blast_output(
         blast_output, casts=[(IDENTITY, "float")])
+
+    # DEBUG
+    #return "\n".join(blast_list)
 
     return "\n".join(
         ["\t".join([str(x) for x in y])
@@ -113,18 +113,23 @@ def get_best_from_group(blast_list, position):
 def simplify_blast_output(blast_list=[], group=[]):
     """Generator that yield the best result for each group of lines."""
 
-    # If there are lines left to process...
-    while blast_list:
-        # Pop the first line in the batch
-        this_line = blast_list.pop(0)
+    try:
+        this_line = next(blast_list)
+
+        if group:
+            if this_line[QUERY] != group[0][QUERY]:
+                # The line is a new group. Process group and yield better
+                yield get_best_from_group(group, IDENTITY)
+                # Empty the group
+                group = []
+
+        # Add this line to the (a) initial group or (b) exhausted group
         group.append(this_line)
 
-        if not blast_list or (blast_list[0][QUERY] != this_line[QUERY]):
-            # List has been just exhausted or the next line is a new group
-            # Either two options: process current group, yield and continue
-            yield get_best_from_group(group, IDENTITY)
-            group = []
-
-        # Recurse the function while blast_list isn't exhausted
-        for x in simplify_blast_output(blast_list=blast_list, group=group):
+        for x in simplify_blast_output(
+                blast_list=blast_list, group=group):
             yield x
+
+    except StopIteration:
+        # We left the last group in the group accumulator.
+        yield get_best_from_group(group, IDENTITY)
