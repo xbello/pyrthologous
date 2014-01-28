@@ -30,7 +30,7 @@ def blastp(query, subject):
     if stderr:
         raise IOError(stderr)
 
-    stdout = get_best_from_blast_output(stdout)
+    stdout = (x for x in get_best_from_blast_output(stdout))
 
     return stdout, stderr
 
@@ -92,12 +92,8 @@ def get_best_from_blast_output(blast_output):
     blast_list = listify_blast_output(
         blast_output, casts=[(IDENTITY, "float")])
 
-    # DEBUG
-    #return "\n".join(blast_list)
-
-    return "\n".join(
-        ["\t".join([str(x) for x in y])
-         for y in simplify_blast_output(blast_list=blast_list, group=[])])
+    for x in simplify_blast_output(blast_list=blast_list, group=[]):
+        yield "\t".join([str(y) for y in x])
 
 
 def get_best_from_group(blast_list, position):

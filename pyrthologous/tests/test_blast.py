@@ -61,7 +61,7 @@ class testBlast(TestCase):
 
         stdout, stderr = blast.blastp(self.prot2, db)
 
-        self.assertEqual(stdout, self.blast_output)
+        self.assertEqual([x for x in stdout][0], self.blast_output)
         self.assertEqual(stderr, "")
 
     def test_make_blast_db(self):
@@ -79,9 +79,13 @@ class testBlast(TestCase):
         # Assert no errors yield by blastp
         self.assertEqual(stderrs, ("", ""))
 
-        # Assert the output is correct (regardless of the order)
-        self.assertEqual(set(stdouts),
-                         set([self.blast_output, self.blast_output_two_best]))
+        # Assert the output are correct
+        stdout_1 = [x for x in stdouts[0]]
+        stdout_2 = [x for x in stdouts[1]]
+        self.assertItemsEqual(
+            [stdout_1, stdout_2],
+            [self.blast_output.split("\n"),
+             self.blast_output_two_best.split("\n")])
 
     def test_listify_blast_output(self):
         # Only one line, no casting
@@ -110,12 +114,16 @@ class testBlast(TestCase):
 
     def test_get_best_from_blast_output(self):
         # Just one group
-        self.assertEqual(blast.get_best_from_blast_output(self.blast_output2),
-                         self.blast_output)
+        self.assertEqual(
+            [x for x in
+             blast.get_best_from_blast_output(self.blast_output2)][0],
+            self.blast_output)
 
         #Multiple groups
-        self.assertEqual(blast.get_best_from_blast_output(self.blast_output3),
-                         self.blast_output_two_best)
+        self.assertEqual(
+            "\n".join([x for x in blast.get_best_from_blast_output(
+                self.blast_output3)]),
+            self.blast_output_two_best)
 
     def test_simplify_blast_output(self):
         # One group get simplified to its best line
