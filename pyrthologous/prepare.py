@@ -57,6 +57,9 @@ def translate_fasta(fasta_path, output_path=""):
     if not output_path:
         output_path = os.path.join(BASE_PATH, OUTPUT)
 
+    if not os.path.isdir(output_path):
+        os.makedirs(output_path)
+
     records = SeqIO.parse(fasta_path, "fasta")
     # Create a new fasta file to save the output
     with open(os.path.join(

@@ -11,7 +11,7 @@ SUFFIX = "NORM"
 SEP = ";"
 BASE_PATH = os.path.join(os.getcwd())
 # This is where the genomes are relative to BASE_PATH:
-GENOMES = "mock_genome"
+GENOMES = "Parasites"
 
 OUTPUT = "Parasites_output"
 

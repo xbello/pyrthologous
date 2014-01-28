@@ -1,9 +1,11 @@
 """Test for module blast."""
 
 import os
+import shutil
 from unittest import TestCase
 
 from .. import blast
+from .. import config
 
 
 class testBlast(TestCase):
@@ -48,6 +50,9 @@ class testBlast(TestCase):
         for filep in os.listdir(self.tgt_path):
             if filep.endswith((".phr", ".pin", ".psq")):
                 os.unlink(os.path.join(self.tgt_path, filep))
+            if os.path.isdir(os.path.join(self.tgt_path, filep)):
+                if filep in ["prots", config.OUTPUT]:
+                    shutil.rmtree(os.path.join(self.tgt_path, filep))
 
     def test_blastp(self):
         """Test blastp output: shown blastp output vs expected output."""
@@ -56,36 +61,44 @@ class testBlast(TestCase):
 
         stdout, stderr = blast.blastp(self.prot2, db)
 
-        self.assertEqual(stdout, self.blast_output)
+        self.assertEqual([x for x in stdout][0], self.blast_output)
         self.assertEqual(stderr, "")
 
     def test_make_blast_db(self):
         self.assertEqual(
             blast.make_blast_db(self.prots,
                                 os.path.join(self.tgt_path, "prots")),
-            os.path.join(self.tgt_path, "prots"))
+            os.path.join(self.tgt_path,
+                         "prots",
+                         os.path.basename(self.prots)))
 
-    def test_reciprocal_blastp(self):
+    def test_reciprocal_blastp_outputs(self):
         pair = (self.prots, self.prot2)
         stdouts, stderrs = zip(*[x for x in blast.reciprocal_blastp(pair)])
 
         # Assert no errors yield by blastp
         self.assertEqual(stderrs, ("", ""))
 
-        # Assert the output is correct (regardless of the order)
-        self.assertEqual(set(stdouts),
-                         set([self.blast_output, self.blast_output_two_best]))
+        # Assert the output are correct
+        stdout_1 = [x for x in stdouts[0]]
+        stdout_2 = [x for x in stdouts[1]]
+        self.assertItemsEqual(
+            [stdout_1, stdout_2],
+            [self.blast_output.split("\n"),
+             self.blast_output_two_best.split("\n")])
 
     def test_listify_blast_output(self):
         # Only one line, no casting
-        list_blast_output = [self.blast_output.split("\t")]
+        list_blast_output = self.blast_output.split("\t")
         self.assertEqual(
-            blast.listify_blast_output(self.blast_output), list_blast_output)
+            blast.listify_blast_output(self.blast_output).next(),
+            list_blast_output)
 
         # Cast the second column to a float
-        list_blast_output[0][2] = float(list_blast_output[0][2])
-        self.assertEqual(blast.listify_blast_output(
-            self.blast_output, casts=[(2, "float")]),
+        list_blast_output[2] = float(list_blast_output[2])
+        self.assertEqual(
+            blast.listify_blast_output(
+                self.blast_output, casts=[(2, "float")]).next(),
             list_blast_output)
 
         # Multiline, with casting second columnt to float
@@ -94,42 +107,40 @@ class testBlast(TestCase):
         for i in list_blast_output:
             i[2] = float(i[2])
 
-        self.assertEqual(blast.listify_blast_output(
-            self.blast_output2, casts=[(2, "float")]),
+        self.assertItemsEqual(
+            [x for x in blast.listify_blast_output(
+                self.blast_output2, casts=[(2, "float")])],
             list_blast_output)
 
     def test_get_best_from_blast_output(self):
         # Just one group
-        self.assertEqual(blast.get_best_from_blast_output(self.blast_output2),
-                         self.blast_output)
+        self.assertEqual(
+            [x for x in
+             blast.get_best_from_blast_output(self.blast_output2)][0],
+            self.blast_output)
 
         #Multiple groups
-        self.assertEqual(blast.get_best_from_blast_output(self.blast_output3),
-                         self.blast_output_two_best)
+        self.assertEqual(
+            "\n".join([x for x in blast.get_best_from_blast_output(
+                self.blast_output3)]),
+            self.blast_output_two_best)
 
     def test_simplify_blast_output(self):
         # One group get simplified to its best line
-        output_as_list = [x.split("\t") for x in
-                          self.blast_output2.split("\n")]
-        self.assertEqual(blast.simplify_blast_output(
-            blast_list=output_as_list,
-            group=[], best_matches=[]),
-            [self.blast_output.split("\t")])
+        output_as_list = (x.split("\t") for x in
+                          self.blast_output2.split("\n"))
 
-    def test_simplify_blast_output_with_2(self):
-        # Multiple groups get simplified to its bests lines each
-        output_as_list = [x.split("\t") for x in
-                          self.blast_output3.split("\n")]
-        self.assertEqual(blast.simplify_blast_output(
-            blast_list=output_as_list,
-            group=[], best_matches=[]),
-            [x.split("\t") for x in self.blast_output_two_best.split("\n")])
+        bests = [x for x in blast.simplify_blast_output(
+            blast_list=output_as_list, group=[])]
 
-    def test_s_b_o(self):
-        output_as_list = [x.split("\t") for x in
-                          self.blast_output3.split("\n")]
+        self.assertEqual(bests, [self.blast_output.split("\t")])
 
-        bests = [x for x in blast.s_b_o(blast_list=output_as_list, group=[])]
+        # Multiple groups simplified to its best lines
+        output_as_list = (x.split("\t") for x in
+                          self.blast_output3.split("\n"))
+
+        bests = [x for x in blast.simplify_blast_output(
+            blast_list=output_as_list, group=[])]
 
         self.assertEqual(
             bests,
