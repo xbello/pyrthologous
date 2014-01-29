@@ -15,10 +15,10 @@ if __name__ == "__main__":
                 raise IOError("File {0} doesn't exist".format(specie))
 
             # Translate both genomes only if they doesn't exist
-            this_genome = os.path.join(BASE_PATH, GENOMES, specie)
+            this_genome = os.path.join(BASE_PATH, OUTPUT, specie)
             if not os.path.isfile(this_genome):
                 translate_fasta(os.path.join(BASE_PATH, GENOMES, specie),
-                                output_path=os.dirname(this_genome))
+                                output_path=os.path.dirname(this_genome))
 
         # TODO: Reciprocal blast'em
         abs_paths = [os.path.join(BASE_PATH, OUTPUT, x) for x in pair]
