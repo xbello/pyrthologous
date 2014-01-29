@@ -23,7 +23,14 @@ if __name__ == "__main__":
         # TODO: Reciprocal blast'em
         abs_paths = [os.path.join(BASE_PATH, OUTPUT, x) for x in pair]
 
-        print [x for x in blast.reciprocal_blastp(abs_paths)]
+        outputs, errs = zip(*blast.reciprocal_blastp(abs_paths))
+        # Put each output in a list
+        out_dict = {}
+        for output in outputs:
+            for k, v in [blast.blastout_to_tuple(x) for x in output]:
+                out_dict[k] = v
+
+        print out_dict
         break
 
 
