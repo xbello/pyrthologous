@@ -15,15 +15,22 @@ if __name__ == "__main__":
                 raise IOError("File {0} doesn't exist".format(specie))
 
             # Translate both genomes only if they doesn't exist
-            this_genome = os.path.join(BASE_PATH, GENOMES, specie)
+            this_genome = os.path.join(BASE_PATH, OUTPUT, specie)
             if not os.path.isfile(this_genome):
                 translate_fasta(os.path.join(BASE_PATH, GENOMES, specie),
-                                output_path=os.dirname(this_genome))
+                                output_path=os.path.dirname(this_genome))
 
         # TODO: Reciprocal blast'em
         abs_paths = [os.path.join(BASE_PATH, OUTPUT, x) for x in pair]
 
-        print [x for x in blast.reciprocal_blastp(abs_paths)]
+        outputs, errs = zip(*blast.reciprocal_blastp(abs_paths))
+        # Put each output in a list
+        out_dict = {}
+        for output in outputs:
+            for k, v in [blast.blastout_to_tuple(x) for x in output]:
+                out_dict[k] = v
+
+        print out_dict
         break
 
 

@@ -54,6 +54,21 @@ class testBlast(TestCase):
                 if filep in ["prots", config.OUTPUT]:
                     shutil.rmtree(os.path.join(self.tgt_path, filep))
 
+    def test_blastout_to_tuple(self):
+        blast_dict = {}
+        for k, v in [blast.blastout_to_tuple(x.split("\t")) for x in
+                     self.blast_output_two_best.split("\n")]:
+            blast_dict[k] = v
+
+        self.assertEqual(
+            blast_dict,
+            {"Prot1": ("Protein_query",
+                       ["31.25", "16", "11", "0", "168", "183",
+                        "262", "277", "3.3", "15.0"]),
+             "Prot2": ("Protein_query",
+                       ["99.33", "300", "0", "2", "2", "300",
+                        "122", "420", "0.0", " 626"])})
+
     def test_blastp(self):
         """Test blastp output: shown blastp output vs expected output."""
         db = blast.make_blast_db(self.prots,
@@ -61,7 +76,8 @@ class testBlast(TestCase):
 
         stdout, stderr = blast.blastp(self.prot2, db)
 
-        self.assertEqual([x for x in stdout][0], self.blast_output)
+        self.assertEqual("\t".join([x for x in stdout][0]),
+                         self.blast_output)
         self.assertEqual(stderr, "")
 
     def test_make_blast_db(self):
@@ -74,42 +90,30 @@ class testBlast(TestCase):
 
     def test_reciprocal_blastp_outputs(self):
         pair = (self.prots, self.prot2)
-        stdouts, stderrs = zip(*[x for x in blast.reciprocal_blastp(pair)])
+        stdouts, stderrs = zip(*blast.reciprocal_blastp(pair))
 
         # Assert no errors yield by blastp
         self.assertEqual(stderrs, ("", ""))
 
         # Assert the output are correct
-        stdout_1 = [x for x in stdouts[0]]
-        stdout_2 = [x for x in stdouts[1]]
+        stdout_1 = ["\t".join(x) for x in stdouts[0]]
+        stdout_2 = ["\t".join(x) for x in stdouts[1]]
         self.assertItemsEqual(
             [stdout_1, stdout_2],
             [self.blast_output.split("\n"),
              self.blast_output_two_best.split("\n")])
 
-    def test_listify_blast_output(self):
+    def test_listify_blast_line(self):
         # Only one line, no casting
         list_blast_output = self.blast_output.split("\t")
         self.assertEqual(
-            blast.listify_blast_output(self.blast_output).next(),
+            blast.listify_blast_line(self.blast_output),
             list_blast_output)
 
         # Cast the second column to a float
         list_blast_output[2] = float(list_blast_output[2])
         self.assertEqual(
-            blast.listify_blast_output(
-                self.blast_output, casts=[(2, "float")]).next(),
-            list_blast_output)
-
-        # Multiline, with casting second columnt to float
-        list_blast_output = [x.split("\t") for x in
-                             self.blast_output2.rstrip().split("\n")]
-        for i in list_blast_output:
-            i[2] = float(i[2])
-
-        self.assertItemsEqual(
-            [x for x in blast.listify_blast_output(
-                self.blast_output2, casts=[(2, "float")])],
+            blast.listify_blast_line(self.blast_output, casts=[(2, "float")]),
             list_blast_output)
 
     def test_get_best_from_blast_output(self):
@@ -117,18 +121,18 @@ class testBlast(TestCase):
         self.assertEqual(
             [x for x in
              blast.get_best_from_blast_output(self.blast_output2)][0],
-            self.blast_output)
+            self.blast_output.split("\t"))
 
         #Multiple groups
-        self.assertEqual(
-            "\n".join([x for x in blast.get_best_from_blast_output(
-                self.blast_output3)]),
-            self.blast_output_two_best)
+        self.assertItemsEqual(
+            [x for x in blast.get_best_from_blast_output(
+                self.blast_output3)],
+            [x.split("\t") for x in self.blast_output_two_best.split("\n")])
 
     def test_simplify_blast_output(self):
         # One group get simplified to its best line
-        output_as_list = (x.split("\t") for x in
-                          self.blast_output2.split("\n"))
+        output_as_list = [x.split("\t") for x in
+                          self.blast_output2.split("\n")]
 
         bests = [x for x in blast.simplify_blast_output(
             blast_list=output_as_list, group=[])]
@@ -136,8 +140,8 @@ class testBlast(TestCase):
         self.assertEqual(bests, [self.blast_output.split("\t")])
 
         # Multiple groups simplified to its best lines
-        output_as_list = (x.split("\t") for x in
-                          self.blast_output3.split("\n"))
+        output_as_list = [x.split("\t") for x in
+                          self.blast_output3.split("\n")]
 
         bests = [x for x in blast.simplify_blast_output(
             blast_list=output_as_list, group=[])]

@@ -11,6 +11,13 @@ QUERY = 0
 IDENTITY = 2
 
 
+def blastout_to_tuple(blast_line):
+    """Return a tuple (key, value) with each blast_line entry."""
+
+    #data = blast_line.rstrip().split("\t")
+    return blast_line[0], (blast_line[1], blast_line[2:])
+
+
 def blastp(query, subject):
     """Return the output for a blast from query to subject."""
 
@@ -30,7 +37,7 @@ def blastp(query, subject):
     if stderr:
         raise IOError(stderr)
 
-    stdout = (x for x in get_best_from_blast_output(stdout))
+    stdout = get_best_from_blast_output(stdout)
 
     return stdout, stderr
 
@@ -55,45 +62,45 @@ def make_blast_db(src, tgt):
 
 
 def reciprocal_blastp(query_subject):
-    """Blast the first of query_subject against the second and viceversa.
+    """Return a list of tuples (output generator, errors).
+
+    Blast the first of query_subject against the second and viceversa.
 
     query_subject is a set as (query, subject)
 
     """
 
+    outputs = []
     for query, subject in query_subject, query_subject[::-1]:
         # Make the database
         db = make_blast_db(subject,
                            os.path.join(os.path.dirname(subject), OUTPUT))
 
         # Blast'em
-        stdout, stderr = blastp(query, db)
+        outputs.append(blastp(query, db))
 
-        # Yield and repeat
-        yield stdout, stderr
+    return outputs
 
 
-def listify_blast_output(blast_output, casts=[]):
+def listify_blast_line(match_line, casts=[]):
     """Return a list with the blast output."""
 
-    for match_line in blast_output.rstrip().split("\n"):
-        new_line = match_line.split("\t")
-        for cast in casts:
-            # Cast the columns in "casts" to types for further comparisons
-            new_line[cast[0]] = getattr(
-                __builtin__, cast[1])(new_line[cast[0]])
+    new_line = match_line.split("\t")
+    for cast in casts:
+        # Cast the columns in "casts" to types for further comparisons
+        new_line[cast[0]] = getattr(
+            __builtin__, cast[1])(new_line[cast[0]])
 
-        yield new_line
+    return new_line
 
 
 def get_best_from_blast_output(blast_output):
     """Return only the best matches for each group of matches."""
 
-    blast_list = listify_blast_output(
-        blast_output, casts=[(IDENTITY, "float")])
+    blast_list = [listify_blast_line(y, casts=[(IDENTITY, "float")])
+                  for y in blast_output.rstrip().split("\n")]
 
-    for x in simplify_blast_output(blast_list=blast_list, group=[]):
-        yield "\t".join([str(y) for y in x])
+    return simplify_blast_output(blast_list=blast_list, group=[])
 
 
 def get_best_from_group(blast_list, position):
@@ -103,29 +110,20 @@ def get_best_from_group(blast_list, position):
     best_match = sorted(
         blast_list, key=itemgetter(position), reverse=True)[0]
 
-    return best_match
+    return [str(x) for x in best_match]
 
 
 def simplify_blast_output(blast_list=[], group=[]):
     """Generator that yield the best result for each group of lines."""
 
-    try:
-        this_line = next(blast_list)
-
-        if group:
-            if this_line[QUERY] != group[0][QUERY]:
-                # The line is a new group. Process group and yield better
-                yield get_best_from_group(group, IDENTITY)
-                # Empty the group
-                group = []
-
-        # Add this line to the (a) initial group or (b) exhausted group
+    # If there are lines left to process...
+    while blast_list:
+        # Pop the first line in the batch
+        this_line = blast_list.pop(0)
         group.append(this_line)
 
-        for x in simplify_blast_output(
-                blast_list=blast_list, group=group):
-            yield x
-
-    except StopIteration:
-        # We left the last group in the group accumulator.
-        yield get_best_from_group(group, IDENTITY)
+        if not blast_list or (blast_list[0][QUERY] != this_line[QUERY]):
+            # List has been just exhausted or the next line is a new group
+            # Either two options: process current group, yield and continue
+            yield get_best_from_group(group, IDENTITY)
+            group = []

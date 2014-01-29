@@ -16,6 +16,15 @@ GENOMES = "Parasites"
 OUTPUT = "Parasites_output"
 
 COMPARE = (
-    ("E_cuniculi.fasta", "E_intestinalis.fasta"),
-    ("E_dispar.fasta", "E_moshkovskii.fasta"),
-    ("E_hellem.fasta", "E_romaleae.fasta"))
+    #("1.fas", "3.fas"),
+    ("Ehellem.fasta", "Eromaleae.fasta"),
+    #("Ecuniculi.fasta", "Eintestinalis.fasta"),
+    #("Edispar.fasta", "Emoshkovskii.fasta"),
+    #("Torientalis.fasta", "Tequi.fasta"),
+    #("Ehistolytica.fasta", "Enuttalli.fasta"),
+    #("Edispar.fasta", "Ehistolytica.fasta"),
+    #("Lmajor.fasta", "Lmexicana.fasta"),
+    #("Einvadens.fasta", "Emoshkovskii.fasta"),
+    #("Ltarentolae.fasta", "Lbrazilensis.fasta"),
+    #("Linfantum.fasta", "Ldonovani.fasta"),
+)
