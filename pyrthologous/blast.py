@@ -127,7 +127,3 @@ def simplify_blast_output(blast_list=[], group=[]):
             # Either two options: process current group, yield and continue
             yield get_best_from_group(group, IDENTITY)
             group = []
-
-        # Recurse the function while blast_list isn't exhausted
-        for x in simplify_blast_output(blast_list=blast_list, group=group):
-            yield x
