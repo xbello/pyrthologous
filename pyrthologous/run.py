@@ -5,10 +5,9 @@ import subprocess
 from Bio import SeqIO
 from tempfile import NamedTemporaryFile
 
-import blast
-from .config import *
-from .prepare import translate_fasta
-from .utils import detranslate
+from pyrthologous import blast
+from pyrthologous.prepare import translate_fasta
+from pyrthologous.utils import detranslate
 
 
 def align(pair):
@@ -22,7 +21,7 @@ def align(pair):
     tmp_align.seek(0)
     # Align the matches
     proc = subprocess.Popen(
-        [MUSCLE,
+        [c.MUSCLE,
          "-in", tmp_align.name,
          "-out", align_file],
         stderr=subprocess.PIPE)
@@ -41,7 +40,7 @@ def blast_pair(pair):
     """Return a dict with the results of a reciprocal blast."""
 
     out_dicts = []
-    abs_paths = [os.path.join(BASE_PATH, OUTPUT, x) for x in pair]
+    abs_paths = [os.path.join(c.BASE_PATH, c.OUTPUT, x) for x in pair]
 
     outputs, errs = zip(*blast.reciprocal_blastp(abs_paths))
     # Put each output in a list
@@ -82,8 +81,8 @@ def init_pair(pair):
                "aa": []}
 
     for specie in pair:
-        aa_genome = os.path.join(BASE_PATH, OUTPUT, specie)
-        base_genome = os.path.join(BASE_PATH, GENOMES, specie)
+        aa_genome = os.path.join(c.BASE_PATH, c.OUTPUT, specie)
+        base_genome = os.path.join(c.BASE_PATH, c.GENOMES, specie)
 
         if not os.path.isfile(base_genome):
             raise IOError("File {0} doesn't exist".format(specie))
@@ -102,7 +101,22 @@ def init_pair(pair):
 
 
 if __name__ == "__main__":
-    for pair in COMPARE:
+    import sys
+    # Get the config for a config.py of CWD dir
+    if os.path.isfile(os.path.join(os.getcwd(), "config.py")):
+        # There is a config.py file in the calling directory, load it
+        from imp import load_source
+        c = load_source("config",
+                        os.path.join(os.getcwd(), "config.py"))
+    else:
+        import pyrthologous.config as c
+
+    print c.COMPARE
+
+    sys.exit()
+    import config as c
+    for pair in c.COMPARE:
+
         # Generate the genomes
         import sys
         genomes = init_pair(pair)
