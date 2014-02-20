@@ -2,6 +2,7 @@
 
 import os
 import subprocess
+import tarfile
 from Bio import SeqIO
 from tempfile import NamedTemporaryFile
 
@@ -115,21 +116,26 @@ if __name__ == "__main__":
     for pair in c.COMPARE:
 
         # Generate the genomes
-        import sys
         genomes = init_pair(pair)
 
         best_matches = get_best_matches(blast_pair(pair))
 
+        # Create the tar pack
+        pair_name = "{0}_vs_{1}.tgz".format(
+            *[x.split(".")[0] for x in pair])
+        tar_file = tarfile.open(
+            os.path.join(c.BASE_PATH, c.OUTPUT, pair_name), "w:gz")
+
         # Align each match
-        alignments = []
         for match in best_matches:
             align_file = align(get_seq_from(match, genomes["aa"]))
             # De-translate each alignment
             base_align = detranslate(
                 align_file, get_seq_from(match, genomes["base"]))
             SeqIO.write(base_align, open(align_file, "w"), "fasta")
-            print align_file
-            sys.exit()
+            # Add each alignment to the tar pack
+            tar_file.add(align_file, recursive=False)
+            # TODO: Remove the temporary file
+            # os.unlink(align_file)
 
-
-        # TODO: Pack the results and clean the house
+        tar_file.close()
