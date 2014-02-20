@@ -43,7 +43,7 @@ def blast_pair(pair):
     out_dicts = []
     abs_paths = [os.path.join(c.BASE_PATH, c.OUTPUT, x) for x in pair]
 
-    outputs, errs = zip(*blast.reciprocal_blastp(abs_paths))
+    outputs, errs = zip(*blast.reciprocal_blastp(abs_paths, c))
     # Put each output in a list
     for output in outputs:
         out_dict = {}
@@ -109,12 +109,7 @@ if __name__ == "__main__":
     else:
         import pyrthologous.config as c
 
-    print c.COMPARE
-
-    sys.exit()
-    import config as c
     for pair in c.COMPARE:
-
         # Generate the genomes
         genomes = init_pair(pair)
 
@@ -139,3 +134,4 @@ if __name__ == "__main__":
             # os.unlink(align_file)
 
         tar_file.close()
+        print tar_file.name
