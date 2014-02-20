@@ -64,14 +64,11 @@ def get_seq_from(pair, dict_of_seqs):
 
 
 def get_best_matches(dict_of_matches):
-    """Return a list with a pair of reciprocal matches."""
-    matches = []
+    """Yield a list with a pair of reciprocal matches."""
 
     for k, v in dict_of_matches[0].iteritems():
         if v[0] in dict_of_matches[1] and k == dict_of_matches[1][v[0]][0]:
-            matches.append((k, v[0]))
-
-    return matches
+            yield (k, v[0])
 
 
 def init_pair(pair):
