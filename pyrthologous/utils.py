@@ -11,8 +11,10 @@ def detranslate(filename, base_seq):
     base_alignment = []
 
     for k, v in alignment.items():
-        base_alignment.append(SeqRecord(
-            reverse_translate(v.seq, base_seq[k].seq), id=k, description=""))
+        base_alignment.append(
+            SeqRecord(reverse_translate(v.seq, base_seq[k].seq),
+                      id=k,
+                      description=""))
 
     return base_alignment
 
