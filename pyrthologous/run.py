@@ -118,6 +118,7 @@ if __name__ == "__main__":
     import pstats
     pr = cProfile.Profile()
     pr.enable()
+    pr.disable()
     for pair in c.COMPARE:
         # Generate the genomes
         genomes = init_pair(pair)
@@ -143,5 +144,5 @@ if __name__ == "__main__":
 
         tar_file.close()
         print tar_file.name
-    pr.disable()
-    pstats.Stats(pr).sort_stats("time").print_stats(10)
+    #pr.disable()
+    #pstats.Stats(pr).sort_stats("time").print_stats(10)

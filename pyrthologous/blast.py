@@ -23,10 +23,10 @@ def blastp(query, subject, config):
     command = [config.BLASTP,
                "-query", query,
                "-db", subject,
-               "-outfmt", "6"]
-               # XXX This flag have erratical behaviour among BLAST versions
-               # 2.2.27+ output differs from 2.2.28+
-               #"-max_target_seqs", "1"]
+               "-outfmt", "6",
+               # XXX -max_target_seqs flag have erratical behaviour among
+               # BLAST versions. 2.2.27+ output differs from 2.2.28+
+               "-max_target_seqs", "1"]
 
     p = subprocess.Popen(command,
                          stdout=subprocess.PIPE,
