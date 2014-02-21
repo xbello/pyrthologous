@@ -106,13 +106,16 @@ if __name__ == "__main__":
         from imp import load_source
         c = load_source("config",
                         os.path.join(os.getcwd(), "config.py"))
+        # Python3:
+        # from importlib.machinery import SourceFileLoader
+        # c = SourceFileLoader("config", "config.py").load_module()
+
     else:
         import pyrthologous.config as c
 
     for pair in c.COMPARE:
         # Generate the genomes
         genomes = init_pair(pair)
-
         best_matches = get_best_matches(blast_pair(pair))
 
         # Create the tar pack
@@ -130,8 +133,8 @@ if __name__ == "__main__":
             SeqIO.write(base_align, open(align_file, "w"), "fasta")
             # Add each alignment to the tar pack
             tar_file.add(align_file, recursive=False)
-            # TODO: Remove the temporary file
-            # os.unlink(align_file)
+            # Remove the temporary file
+            os.unlink(align_file)
 
         tar_file.close()
         print tar_file.name
