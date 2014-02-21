@@ -19,3 +19,11 @@ class testUtils(TestCase):
         self.assertEqual(str(recs[1].seq), "KEREREQERCSS")
 
         self.assertEqual(recs[0].id, "Single Amino")
+
+    def test_reverse_translate(self):
+        seq_bases = "AAGGAGAGGGAGAGAGAGCAGGAACGATGTTCTTCC"
+        seq_aa = "K-ERERE-QERCSS"
+
+        self.assertEqual(
+            utils.reverse_translate(seq_aa, seq_bases),
+            "AAG---GAGAGGGAGAGAGAG---CAGGAACGATGTTCTTCC")

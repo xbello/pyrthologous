@@ -113,6 +113,11 @@ if __name__ == "__main__":
     else:
         import pyrthologous.config as c
 
+
+    import cProfile
+    import pstats
+    pr = cProfile.Profile()
+    pr.enable()
     for pair in c.COMPARE:
         # Generate the genomes
         genomes = init_pair(pair)
@@ -138,3 +143,5 @@ if __name__ == "__main__":
 
         tar_file.close()
         print tar_file.name
+    pr.disable()
+    pstats.Stats(pr).sort_stats("time").print_stats(10)
