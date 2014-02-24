@@ -8,7 +8,7 @@ from tempfile import NamedTemporaryFile
 
 from pyrthologous import blast
 from pyrthologous.prepare import translate_fasta
-from pyrthologous.utils import detranslate
+from pyrthologous.utils import detranslate, clean_dict
 
 
 def align(pair):
@@ -44,6 +44,7 @@ def blast_pair(pair):
     abs_paths = [os.path.join(c.BASE_PATH, c.OUTPUT, x) for x in pair]
 
     outputs, errs = zip(*blast.reciprocal_blastp(abs_paths, c))
+
     # Put each output in a list
     for output in outputs:
         out_dict = {}
@@ -60,6 +61,10 @@ def get_seq_from(pair, dict_of_seqs):
     pair_dict = dict.fromkeys(pair)
     for seq in pair:
         pair_dict[seq] = dict_of_seqs[0].get(seq) or dict_of_seqs[1].get(seq)
+        if not pair_dict[seq]:
+            raise KeyError("{0} not found in genomes.".format(seq))
+        if not pair_dict[seq].id:
+            raise KeyError("{0} didn't have an id field.".format(seq))
 
     return pair_dict
 
@@ -95,11 +100,44 @@ def init_pair(pair):
         genomes["aa"].append(
             SeqIO.to_dict(SeqIO.parse(aa_genome, "fasta")))
 
+        genomes["base"] = clean_dict(genomes["base"])
+        genomes["aa"] = clean_dict(genomes["aa"])
+
     return genomes
 
 
+def main(pair, output_path):
+    """Run the main script, useful for multicoring."""
+
+    # Generate the pair id
+    pair_name = "{0}_vs_{1}".format(
+        *[x.split(".")[0] for x in pair])
+
+    # Generate the genomes
+    genomes = init_pair(pair)
+
+    best_matches = get_best_matches(blast_pair(pair))
+
+    # Create the tar pack
+    tar_file = tarfile.open(
+        os.path.join(output_path, pair_name + ".tgz"), "w:gz")
+
+    # Align each match
+    for match in best_matches:
+        align_file = align(get_seq_from(match, genomes["aa"]))
+        # De-translate each alignment
+        base_align = detranslate(
+            align_file, get_seq_from(match, genomes["base"]))
+        SeqIO.write(base_align, open(align_file, "w"), "fasta")
+        # Add each alignment to the tar pack
+        tar_file.add(align_file, recursive=False)
+        # Remove the temporary file
+        os.unlink(align_file)
+
+    tar_file.close()
+    print tar_file.name
+
 if __name__ == "__main__":
-    import sys
     # Get the config for a config.py of CWD dir
     if os.path.isfile(os.path.join(os.getcwd(), "config.py")):
         # There is a config.py file in the calling directory, load it
@@ -113,36 +151,14 @@ if __name__ == "__main__":
     else:
         import pyrthologous.config as c
 
+    from multiprocessing import Pool
+    pool = Pool(4)
+    threads = []
 
-    import cProfile
-    import pstats
-    pr = cProfile.Profile()
-    pr.enable()
-    pr.disable()
     for pair in c.COMPARE:
-        # Generate the genomes
-        genomes = init_pair(pair)
-        best_matches = get_best_matches(blast_pair(pair))
+        output_path = os.path.join(c.BASE_PATH, c.OUTPUT)
+        threads.append(
+            pool.apply_async(main, args=[pair, output_path]))
 
-        # Create the tar pack
-        pair_name = "{0}_vs_{1}.tgz".format(
-            *[x.split(".")[0] for x in pair])
-        tar_file = tarfile.open(
-            os.path.join(c.BASE_PATH, c.OUTPUT, pair_name), "w:gz")
-
-        # Align each match
-        for match in best_matches:
-            align_file = align(get_seq_from(match, genomes["aa"]))
-            # De-translate each alignment
-            base_align = detranslate(
-                align_file, get_seq_from(match, genomes["base"]))
-            SeqIO.write(base_align, open(align_file, "w"), "fasta")
-            # Add each alignment to the tar pack
-            tar_file.add(align_file, recursive=False)
-            # Remove the temporary file
-            os.unlink(align_file)
-
-        tar_file.close()
-        print tar_file.name
-    #pr.disable()
-    #pstats.Stats(pr).sort_stats("time").print_stats(10)
+    pool.close()
+    pool.join()
