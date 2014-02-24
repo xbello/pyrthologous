@@ -4,6 +4,20 @@ from Bio import AlignIO, SeqIO
 from Bio.SeqRecord import SeqRecord
 
 
+def clean_dict(SeqIO_dict):
+    """Return a dict with the keys cleaned."""
+
+    for d in SeqIO_dict:
+        for k in d.keys():
+            if k.endswith(","):
+                # Delete awful last commas
+                d[k[:-1]] = d[k]
+                d[k[:-1]].id = d[k[:-1]].id[:-1]
+                del d[k]
+
+    return SeqIO_dict
+
+
 def detranslate(filename, base_seq):
     """Return the de-translated sequences of filename."""
 
