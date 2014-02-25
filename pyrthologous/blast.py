@@ -1,6 +1,7 @@
 """Wrapper for blast program."""
 
 import __builtin__
+import logging
 import os
 import subprocess
 from operator import itemgetter
@@ -8,6 +9,8 @@ from operator import itemgetter
 # Globals for column positions of tab-blast output
 QUERY = 0
 IDENTITY = 2
+
+logger = logging.getLogger(__name__)
 
 
 def blastout_to_tuple(blast_line):
@@ -28,13 +31,18 @@ def blastp(query, subject, config):
                # BLAST versions. 2.2.27+ output differs from 2.2.28+
                "-max_target_seqs", "1"]
 
+    logger.info("Trying to run blastp for {0} against {1}.".format(
+        subject, query))
     p = subprocess.Popen(command,
                          stdout=subprocess.PIPE,
                          stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
 
     if stderr:
+        logger.critical("Failed blastp with '{0}'.".format(stderr))
         raise IOError(stderr)
+
+    logger.info("Ended blastp.")
 
     stdout = get_best_from_blast_output(stdout)
 
@@ -51,11 +59,16 @@ def make_blast_db(src, tgt, config):
     command = [config.BLAST_DB_MAKER,
                "-in", src,
                "-out", tgt,
-               "-dbtype", "prot",
-               "-logfile", "DBBLAST.log"]
+               "-dbtype", "prot"]
 
-    p = subprocess.Popen(command)
-    p.communicate()
+    logger.info("Compiling database with {0}.".format(src))
+    p = subprocess.Popen(command,
+                         stdout=subprocess.PIPE,
+                         stderr=subprocess.PIPE)
+    stdout, stderr = p.communicate()
+
+    if stderr:
+        logger.critical(stderr)
 
     return tgt
 

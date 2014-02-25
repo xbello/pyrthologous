@@ -1,10 +1,13 @@
 """Prepare the files in the input to start the analysis."""
 
+import logging
 import os
 from itertools import chain
 from Bio import SeqIO
 
 from .utils import translate
+
+logger = logging.getLogger(__name__)
 
 
 def check_compare(path="", compare=(), config=None):
@@ -42,6 +45,7 @@ def translate_all_fastas(compare=(), output_path="", config=None):
     # This get the filenames one and only one time
     filenames = set(chain.from_iterable(compare))
 
+    logger.info("Creating new translated fasta in {0}".format(output_path))
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
 
@@ -49,6 +53,8 @@ def translate_all_fastas(compare=(), output_path="", config=None):
         translate_fasta(
             os.path.join(config.BASE_PATH, config.GENOMES, filename),
             output_path=output_path)
+
+    return True
 
 
 def translate_fasta(fasta_path, output_path="", config=None):
@@ -65,5 +71,7 @@ def translate_fasta(fasta_path, output_path="", config=None):
     with open(os.path.join(
             output_path, os.path.basename(fasta_path)), "w") as output:
         SeqIO.write(translate(records), output, "fasta")
+
+    logger.info("Tranlated {0}".format(fasta_path))
 
     return True
