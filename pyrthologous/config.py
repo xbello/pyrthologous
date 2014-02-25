@@ -7,9 +7,14 @@ BLAST_PATH = "/usr/bin/"
 BLASTP = os.path.join(BLAST_PATH, "blastp")
 BLAST_DB_MAKER = os.path.join(BLAST_PATH, "makeblastdb")
 
-SUFFIX = "NORM"
-SEP = ";"
 BASE_PATH = os.path.join(os.getcwd())
+LOGFILE=os.path.join(BASE_PATH, "logfile.log")
+LOGGER = logging.basicConfig(filename=LOGFILE,
+                             filemode='w',
+                             format='%(asctime)s %(message)s',
+                             level=logging.INFO)
+ 18 # This is where the genomes are relative to BASE_PATH:
+
 # This is where the genomes are relative to BASE_PATH:
 GENOMES = "Parasites"
 
