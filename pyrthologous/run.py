@@ -1,40 +1,12 @@
 """Run all the functions with the genomes."""
 
 import os
-import subprocess
 import tarfile
 from Bio import SeqIO
-from tempfile import NamedTemporaryFile
 
 from pyrthologous import blast
 from pyrthologous.prepare import translate_fasta
-from pyrthologous.utils import detranslate, clean_dict
-
-
-def align(pair):
-    """Return a string with the file name to the alignment between a pair."""
-    # Save the matches to temporary files
-    tmp_align = NamedTemporaryFile()
-    align_file = tmp_align.name + ".al.fasta"
-
-    SeqIO.write(pair.values(), tmp_align, "fasta")
-    # Rewind the file so Muscle can read it
-    tmp_align.seek(0)
-    # Align the matches
-    proc = subprocess.Popen(
-        [c.MUSCLE,
-         "-in", tmp_align.name,
-         "-out", align_file],
-        stderr=subprocess.PIPE)
-
-    _, err = proc.communicate()
-    tmp_align.close()
-
-    # Check if Muscle failed
-    if "ERROR" in err:
-        raise IOError(err)
-
-    return align_file
+from pyrthologous.utils import align, detranslate, clean_dict
 
 
 def blast_pair(pair):
@@ -124,7 +96,7 @@ def main(pair, output_path):
 
     # Align each match
     for match in best_matches:
-        align_file = align(get_seq_from(match, genomes["aa"]))
+        align_file = align(get_seq_from(match, genomes["aa"]), c)
         # De-translate each alignment
         base_align = detranslate(
             align_file, get_seq_from(match, genomes["base"]))
