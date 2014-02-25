@@ -1,4 +1,5 @@
 """Config the user constants."""
+import logging
 import os
 
 MUSCLE = os.path.expanduser("~/bin/muscle")
@@ -13,7 +14,6 @@ LOGGER = logging.basicConfig(filename=LOGFILE,
                              filemode='w',
                              format='%(asctime)s %(message)s',
                              level=logging.INFO)
- 18 # This is where the genomes are relative to BASE_PATH:
 
 # This is where the genomes are relative to BASE_PATH:
 GENOMES = "Parasites"
