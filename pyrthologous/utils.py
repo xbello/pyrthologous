@@ -1,7 +1,42 @@
 """Miscelaneous functions for the module."""
 
+import logging
+import subprocess
+from tempfile import NamedTemporaryFile
+
 from Bio import AlignIO, SeqIO
 from Bio.SeqRecord import SeqRecord
+
+logger = logging.getLogger(__name__)
+
+
+def align(pair, config):
+    """Return a string with the file name to the alignment between a pair."""
+    # Save the matches to temporary files
+    tmp_align = NamedTemporaryFile()
+    align_file = tmp_align.name + ".al.fasta"
+
+    SeqIO.write(pair.values(), tmp_align, "fasta")
+    # Rewind the file so Muscle can read it
+    tmp_align.seek(0)
+    # Align the matches
+    logger.info("Aligning {0} vs {1}.".format(*pair.keys()))
+
+    proc = subprocess.Popen(
+        [config.MUSCLE,
+         "-in", tmp_align.name,
+         "-out", align_file],
+        stderr=subprocess.PIPE)
+
+    _, err = proc.communicate()
+    tmp_align.close()
+
+    # Check if Muscle failed
+    if "ERROR" in err:
+        logger.critical("Failed while aligning {0}".format(err))
+        raise IOError(err)
+
+    return align_file
 
 
 def clean_dict(SeqIO_dict):
