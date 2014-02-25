@@ -132,5 +132,12 @@ if __name__ == "__main__":
         threads.append(
             pool.apply_async(main, args=[pair, output_path]))
 
+    for t in threads:
+        # This catches and reraises any error in any thread
+        try:
+            t.get()
+        except:
+            raise
+
     pool.close()
     pool.join()
