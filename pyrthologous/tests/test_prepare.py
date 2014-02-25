@@ -2,6 +2,7 @@
 
 import os
 from collections import Counter
+from imp import load_source
 from shutil import rmtree
 from unittest import TestCase
 
@@ -10,6 +11,7 @@ from .. import prepare
 
 class testPrepare(TestCase):
     def setUp(self):
+        self.config = load_source("config", "config.py")
         self.genome = "mock_genome"
         self.genome_path = os.path.join(os.path.dirname(__file__), self.genome)
         self.fastas = ["1.fas", "2.fas", "3.fas",
@@ -40,7 +42,8 @@ class testPrepare(TestCase):
         # Run the scripts
         prepare.translate_all_fastas(
             self.compares,
-            output_path=os.path.join(self.genome_path, "translated"))
+            output_path=os.path.join(self.genome_path, "translated"),
+            config=self.config)
 
         # Then check the results
         for filename in self.fastas[:3]:

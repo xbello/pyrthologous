@@ -4,7 +4,6 @@ import __builtin__
 import os
 import subprocess
 from operator import itemgetter
-from .config import BLASTP, BLAST_DB_MAKER, OUTPUT
 
 # Globals for column positions of tab-blast output
 QUERY = 0
@@ -18,16 +17,16 @@ def blastout_to_tuple(blast_line):
     return blast_line[0], (blast_line[1], blast_line[2:])
 
 
-def blastp(query, subject):
+def blastp(query, subject, config):
     """Return the output for a blast from query to subject."""
 
-    command = [BLASTP,
+    command = [config.BLASTP,
                "-query", query,
                "-db", subject,
-               "-outfmt", "6"]
-               # XXX This flag have erratical behaviour among BLAST versions
-               # 2.2.27+ output differs from 2.2.28+
-               #"-max_target_seqs", "1"]
+               "-outfmt", "6",
+               # XXX -max_target_seqs flag have erratical behaviour among
+               # BLAST versions. 2.2.27+ output differs from 2.2.28+
+               "-max_target_seqs", "1"]
 
     p = subprocess.Popen(command,
                          stdout=subprocess.PIPE,
@@ -42,14 +41,14 @@ def blastp(query, subject):
     return stdout, stderr
 
 
-def make_blast_db(src, tgt):
+def make_blast_db(src, tgt, config):
     """Return the Database name created from ``src``."""
 
     if not os.path.isdir(tgt):
         os.mkdir(tgt)
     tgt = os.path.join(tgt, os.path.basename(src))
 
-    command = [BLAST_DB_MAKER,
+    command = [config.BLAST_DB_MAKER,
                "-in", src,
                "-out", tgt,
                "-dbtype", "prot",
@@ -61,7 +60,7 @@ def make_blast_db(src, tgt):
     return tgt
 
 
-def reciprocal_blastp(query_subject):
+def reciprocal_blastp(query_subject, config):
     """Return a list of tuples (output generator, errors).
 
     Blast the first of query_subject against the second and viceversa.
@@ -74,10 +73,12 @@ def reciprocal_blastp(query_subject):
     for query, subject in query_subject, query_subject[::-1]:
         # Make the database
         db = make_blast_db(subject,
-                           os.path.join(os.path.dirname(subject), OUTPUT))
+                           os.path.join(os.path.dirname(subject),
+                                        config.OUTPUT),
+                           config)
 
         # Blast'em
-        outputs.append(blastp(query, db))
+        outputs.append(blastp(query, db, config))
 
     return outputs
 

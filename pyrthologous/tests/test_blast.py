@@ -2,6 +2,7 @@
 
 import os
 import shutil
+from imp import load_source
 from unittest import TestCase
 
 from .. import blast
@@ -17,6 +18,8 @@ class testBlast(TestCase):
         # This is a fasta with only one protein sequence, Protein_query
         self.prot2 = os.path.abspath(
             os.path.join(self.tgt_path, "prot2.fasta"))
+
+        self.config = load_source("config", "config.py")
 
         self.blast_output = "Protein_query\tProt2\t99.33\t300\t0\t2" +\
             "\t122\t420\t2\t300\t0.0\t 626"
@@ -72,9 +75,10 @@ class testBlast(TestCase):
     def test_blastp(self):
         """Test blastp output: shown blastp output vs expected output."""
         db = blast.make_blast_db(self.prots,
-                                 os.path.join(self.tgt_path, "prots"))
+                                 os.path.join(self.tgt_path, "prots"),
+                                 self.config)
 
-        stdout, stderr = blast.blastp(self.prot2, db)
+        stdout, stderr = blast.blastp(self.prot2, db, self.config)
 
         self.assertEqual("\t".join([x for x in stdout][0]),
                          self.blast_output)
@@ -83,14 +87,15 @@ class testBlast(TestCase):
     def test_make_blast_db(self):
         self.assertEqual(
             blast.make_blast_db(self.prots,
-                                os.path.join(self.tgt_path, "prots")),
+                                os.path.join(self.tgt_path, "prots"),
+                                self.config),
             os.path.join(self.tgt_path,
                          "prots",
                          os.path.basename(self.prots)))
 
     def test_reciprocal_blastp_outputs(self):
         pair = (self.prots, self.prot2)
-        stdouts, stderrs = zip(*blast.reciprocal_blastp(pair))
+        stdouts, stderrs = zip(*blast.reciprocal_blastp(pair, self.config))
 
         # Assert no errors yield by blastp
         self.assertEqual(stderrs, ("", ""))
