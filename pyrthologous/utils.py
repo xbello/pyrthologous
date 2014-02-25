@@ -68,6 +68,22 @@ def detranslate(filename, base_seq):
     return base_alignment
 
 
+def get_seq_from(pair, dict_of_seqs):
+    """Return a set with the sequences for the keys names in pair."""
+
+    # XXX If both sequences in pair are the same, dict will have only one key
+    # XXX Should change this from dicts to sets of two sequences.
+    pair_dict = dict.fromkeys(pair)
+    for seq in pair:
+        pair_dict[seq] = dict_of_seqs[0].get(seq) or dict_of_seqs[1].get(seq)
+        if not pair_dict[seq]:
+            raise KeyError("{0} not found in genomes.".format(seq))
+        if not pair_dict[seq].id:
+            raise KeyError("{0} didn't have an id field.".format(seq))
+
+    return pair_dict
+
+
 def reverse_translate(aa_seq, base_seq):
     """Return a string mapped from seq_aa to bases."""
 
