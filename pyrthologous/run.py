@@ -6,7 +6,7 @@ from Bio import SeqIO
 
 from pyrthologous import blast
 from pyrthologous.prepare import translate_fasta
-from pyrthologous.utils import align, detranslate, clean_dict
+from pyrthologous.utils import align, clean_dict, detranslate, get_seq_from
 
 
 def blast_pair(pair):
@@ -25,20 +25,6 @@ def blast_pair(pair):
         out_dicts.append(out_dict)
 
     return out_dicts
-
-
-def get_seq_from(pair, dict_of_seqs):
-    """Return a dict with the sequence for the key name."""
-
-    pair_dict = dict.fromkeys(pair)
-    for seq in pair:
-        pair_dict[seq] = dict_of_seqs[0].get(seq) or dict_of_seqs[1].get(seq)
-        if not pair_dict[seq]:
-            raise KeyError("{0} not found in genomes.".format(seq))
-        if not pair_dict[seq].id:
-            raise KeyError("{0} didn't have an id field.".format(seq))
-
-    return pair_dict
 
 
 def get_best_matches(dict_of_matches):
