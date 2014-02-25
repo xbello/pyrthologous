@@ -41,6 +41,11 @@ def init_pair(pair):
     genomes = {"base": [],
                "aa": []}
 
+    # TODO Add check: if both genomes have a sequence with the same id,
+    # Biopython will complain loudly after aligning (re-loading the sequence
+    # through a to_dict) by having the key repeated. Abort that from the
+    # beginning if the dicts have the same keys anywhere.
+
     for specie in pair:
         aa_genome = os.path.join(c.BASE_PATH, c.OUTPUT, specie)
         base_genome = os.path.join(c.BASE_PATH, c.GENOMES, specie)
