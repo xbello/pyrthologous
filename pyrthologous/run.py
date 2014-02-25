@@ -15,7 +15,7 @@ def blast_pair(pair):
     out_dicts = []
     abs_paths = [os.path.join(c.BASE_PATH, c.OUTPUT, x) for x in pair]
 
-    outputs, errs = zip(*blast.reciprocal_blastp(abs_paths, c))
+    outputs, _ = zip(*blast.reciprocal_blastp(abs_paths, c))
 
     # Put each output in a list
     for output in outputs:
@@ -78,7 +78,7 @@ def init_pair(pair):
     return genomes
 
 
-def main(pair, output_path):
+def main(pair, out_path):
     """Run the main script, useful for multicoring."""
 
     # Generate the pair id
@@ -92,7 +92,7 @@ def main(pair, output_path):
 
     # Create the tar pack
     tar_file = tarfile.open(
-        os.path.join(output_path, pair_name + ".tgz"), "w:gz")
+        os.path.join(out_path, pair_name + ".tgz"), "w:gz")
 
     # Align each match
     for match in best_matches:
@@ -123,14 +123,15 @@ if __name__ == "__main__":
     else:
         import pyrthologous.config as c
 
-    from multiprocessing import Pool
-    pool = Pool(4)
+    from multiprocessing import Pool, cpu_count
+    cpus = (cpu_count() - 1) or 1
+    pool = Pool(cpus)
     threads = []
 
-    for pair in c.COMPARE:
+    for couple in c.COMPARE:
         output_path = os.path.join(c.BASE_PATH, c.OUTPUT)
         threads.append(
-            pool.apply_async(main, args=[pair, output_path]))
+            pool.apply_async(main, args=[couple, output_path]))
 
     for t in threads:
         # This catches and reraises any error in any thread
