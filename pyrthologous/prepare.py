@@ -4,6 +4,7 @@ import logging
 import os
 from itertools import chain
 from Bio import SeqIO
+from Bio.SeqIO import FastaIO
 
 from .utils import translate
 
@@ -66,7 +67,7 @@ def translate_fasta(fasta_path, output_path="", config=None):
     if not os.path.isdir(output_path):
         os.makedirs(output_path)
 
-    records = SeqIO.parse(fasta_path, "fasta")
+    records = FastaIO.FastaIterator(open(fasta_path))
     # Create a new fasta file to save the output
     with open(os.path.join(
             output_path, os.path.basename(fasta_path)), "w") as output:

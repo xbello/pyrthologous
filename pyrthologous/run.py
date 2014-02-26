@@ -3,10 +3,11 @@
 import os
 import tarfile
 from Bio import SeqIO
+from Bio.SeqIO import FastaIO
 
 from pyrthologous import blast
 from pyrthologous.prepare import translate_fasta
-from pyrthologous.utils import align, clean_dict, detranslate, get_seq_from
+from pyrthologous.utils import align, clean_title, detranslate, get_seq_from
 
 
 def blast_pair(pair):
@@ -59,12 +60,11 @@ def init_pair(pair):
                             output_path=os.path.dirname(aa_genome))
         # If we are here without error, append each genome to genomes
         genomes["base"].append(
-            SeqIO.to_dict(SeqIO.parse(base_genome, "fasta")))
+            SeqIO.to_dict(FastaIO.FastaIterator(open(base_genome),
+                                                title2ids=clean_title)))
         genomes["aa"].append(
-            SeqIO.to_dict(SeqIO.parse(aa_genome, "fasta")))
-
-        genomes["base"] = clean_dict(genomes["base"])
-        genomes["aa"] = clean_dict(genomes["aa"])
+            SeqIO.to_dict(FastaIO.FastaIterator(open(aa_genome),
+                                                title2ids=clean_title)))
 
     return genomes
 

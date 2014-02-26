@@ -39,18 +39,14 @@ def align(pair, config):
     return align_file
 
 
-def clean_dict(SeqIO_dict):
-    """Return a dict with the keys cleaned."""
+def clean_title(fasta_title):
+    """Return id, name and description of a given fasta title."""
+    seq_id = fasta_title.split()[0]
+    # Trim ugly last chars
+    if seq_id.endswith(","):
+        seq_id = seq_id[:-1]
 
-    for d in SeqIO_dict:
-        for k in d.keys():
-            if k.endswith(","):
-                # Delete awful last commas
-                d[k[:-1]] = d[k]
-                d[k[:-1]].id = d[k[:-1]].id[:-1]
-                del d[k]
-
-    return SeqIO_dict
+    return seq_id, "", fasta_title
 
 
 def detranslate(filename, base_seq):

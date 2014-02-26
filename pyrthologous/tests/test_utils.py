@@ -32,14 +32,11 @@ class testUtils(TestCase):
             utils.reverse_translate(seq_aa, seq_bases),
             "AAG---GAGAGGGAGAGAGAG---CAGGAACGATGTTCTTCC")
 
-    def test_clean_dict(self):
-        list_seqs = [{"Bad header,": self.seq3},
-                     {"Multiple Aminos": self.seq2}]
+    def test_clean_title(self):
+        good = "This_is_a_good_title"
+        good1 = good + " with some additions, and other"
+        bad = good + ", or nasty commas"
 
-        clean_dict = utils.clean_dict(list_seqs)
-        # Keys has been cleaned
-        self.assertTrue("Bad header" in clean_dict[0].keys())
-        # Ids has been cleaned
-        self.assertEqual(
-            clean_dict[0]["Bad header"].id,
-            "Bad header")
+        self.assertEqual(utils.clean_title(good), (good, "", good))
+        self.assertEqual(utils.clean_title(good1), (good, "", good1))
+        self.assertEqual(utils.clean_title(bad), (good, "", bad))
